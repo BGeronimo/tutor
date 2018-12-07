@@ -39,7 +39,7 @@
 
 
                 if(!empty($_POST['texto'])){
-                    $texto = $emailEmisor." dice: ".$_POST['texto'];
+                    $texto = $emailEmisor."|".$_POST['texto'];
                 }else{
                     $texto = $emailEmisor." te ha recomendado ha este tutor";
                 }

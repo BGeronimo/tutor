@@ -9,26 +9,36 @@
     $traerTutor2 = $pdo->prepare('SELECT *  FROM tutores WHERE tutor_id=:tutor_id');
     $traerTutor2->bindParam(':tutor_id', $_SESSION['user_id']);
     $traerTutor2->execute();
-
-    $prueba = "parametro1";
-    $echo = explode('|',$prueba);
-    echo count($echo);
     
 
     if(isset($_POST['pedir'])){
-        if(isset($_POST['mandar'])){
-            $cantidad = $_POST['cantidad']-30;
-            $texto = $cantidad."|".$_POST['direccion'];
-            $emisor = "Tutor|".$_SESSION['user_id'];
-            $receptor = "Admin|1";
-            $mandarMensaaje = $pdo->prepare('INSERT INTO mensajes (texto,emisor,receptor) VALUES (:texto,:emisor,:receptor)');
-            $mandarMensaaje->bindParam(':texto',$texto);
-            $mandarMensaaje->bindParam(':emisor',$emisor);
-            $mandarMensaaje->bindParam(':receptor',$receptor);
-            $mandarMensaaje->execute();
-
-        }
-        
+        if($_POST['cantidad']<=$_POST['puntos']){
+            if(isset($_POST['mandar'])){
+                $cantidad = $_POST['cantidad']-30;
+                $texto = $cantidad."|".$_POST['direccion'];
+                $emisor = "Tutor|".$_SESSION['user_id'];
+                $receptor = "Admin|1";
+                $mandarMensaaje = $pdo->prepare('INSERT INTO mensajes (texto,emisor,receptor) VALUES (:texto,:emisor,:receptor)');
+                $mandarMensaaje->bindParam(':texto',$texto);
+                $mandarMensaaje->bindParam(':emisor',$emisor);
+                $mandarMensaaje->bindParam(':receptor',$receptor);
+                $mandarMensaaje->execute();
+            }else{
+                $cantidad = $_POST['cantidad'];
+                $texto = $cantidad."|PAGO DIRECTO";
+                $emisor = "Tutor|".$_SESSION['user_id'];
+                $receptor = "Admin|1";
+                $mandarMensaaje = $pdo->prepare('INSERT INTO mensajes (texto,emisor,receptor) VALUES (:texto,:emisor,:receptor)');
+                $mandarMensaaje->bindParam(':texto',$texto);
+                $mandarMensaaje->bindParam(':emisor',$emisor);
+                $mandarMensaaje->bindParam(':receptor',$receptor);
+                $mandarMensaaje->execute();
+            }
+        }else{
+            echo'<script type="text/javascript">
+            alert("Pide una cantidad valida, no puedes pedir mas del dinero que tinenes");
+            </script>';
+        } 
     }
 ?>
 
@@ -79,11 +89,12 @@
 
         echo '<form action="pedircheque.php" method="post">';
         echo '<div>';
-        echo '<h3>tienes   puntos</h3>';
+        echo '<h3>tienes '.$puntos.' puntos</h3>';
         echo '<label>por cuanto quieres que se haga el cheque</label>';
         echo '<input type="number" name="cantidad" onkeypress="return valida(event)">';
         echo '</div>';
         echo '<div>';
+        echo '<input type="text" name="puntos" value="'.$puntos.'" hidden="true">';
         echo '<label>desea recibir el cheque en su casa (se le descontaran Q.30)</label>';
         echo '<input type="checkbox" name="mandar" onclick="mostrar()">';
         echo '<input type="text" name="direccion" id="direccion" hidden="true">';
@@ -96,28 +107,10 @@
         echo '</form>';
             
     ?>    
-
-    
-        
-            
-            
-            
-        
-        
-            
-            
-
-            
-        
-        
-    
-
-
-
-
     <script type="text/javascript" src="auth.js"></script>
 </body>
 </html>
+
 
 <script>
 function valida(e){

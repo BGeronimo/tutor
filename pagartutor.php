@@ -41,12 +41,7 @@
                 echo'<script>
                     alert("ingresa una cantidad valida");
                     </script>';
-
             }
-
-
-
-
         }
     }
 
@@ -80,12 +75,14 @@
                 echo'<script>
                 alert("se ha hecho todo correctamente");
                 </script>';
+                $mensajeVisto = $pdo->query('UPDATE mensajes SET visto=1 WHERE mensajes_id='.$_SESSION['mensaje'].'');
             }
+        }else{
+            echo'<script>
+            alert("ingresa el numero de cheque");
+            </script>'; 
         }
     }
-
-    
-    
 ?>
 
 
@@ -145,7 +142,6 @@
             echo '<input type="text"  name="cantidad" onkeypress="return valida2(event)" placeholder="cantidad a pagar">';
             if($valor['puntos']<200){
                 echo '<input type="submit" value="cobrar su paga" disabled>';
-
             }else{
                 echo '<input type="submit" value="cobrar su paga" name="pagar" disabled="disabled">';
             }
@@ -160,32 +156,20 @@
         echo '<hr>';
         $_SESSION['idTutor'] = $_GET['id'];
         $_SESSION['cantidad'] = $_GET['cantidad'];
-        if(isset($_GET['direccion'])){
-            $_SESSION['direccion'] = $_GET['direccion'];
-        }
-
+        $_SESSION['direccion'] = $_GET['direccion'];
+        $_SESSION['mensaje'] = $_GET['mensaje'];
+        
         echo '<form action="pagartutor.php" method="post">';
         echo '<input type="text" onkeypress="return valida(event)" name="nocheque" maxlength="12" onkeyup="validar(this.form)">';
         echo '<input type="text"  name="cantidad" value="'.$_SESSION['cantidad'].'" onkeypress="return valida2(event)" disabled>';
         echo '<input type="text" name="direccion" value="'.$_SESSION['direccion'].'" disabled>';
-        echo '<input type="submit" value="hacer cheque" name="hacerCheque">';
+        echo '<input type="text" name="mensaje" value="'.$_SESSION['mensaje'].'" hidden="true">';
+        echo '<input type="submit" value="hacer registro de cheque" name="hacerCheque">';
         echo '</form>';
     }
 
-    
-    
-
-
     ?>
     <script type="text/javascript" src="auth.js"></script>
-
-
-    
-    
-    
-    
-
-
 </body>
 </html>
 
@@ -218,6 +202,7 @@ function valida2(e){
     tecla_final = String.fromCharCode(tecla);
     return patron.test(tecla_final);
 }
+
 function validar(frm) {
   frm.pagar.disabled = false;
   for (i=0; i<3; i++)

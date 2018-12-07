@@ -14,7 +14,6 @@
 
     if(isset($_POST['enviar'])){
 
-
         $horas = (int)$_POST['cantidadHoras'];
         $cobra = 0;
         foreach($traerDatosTutor as $valor){
@@ -28,9 +27,9 @@
 
         if($cantidadCobrar>$tiene){
             echo'<script type="text/javascript">
-            alert("no tienes el dinero suficiente");
-            location.href="comprarpuntos.php";
-            </script>';
+                 alert("no tienes el dinero suficiente");
+                 location.href="comprarpuntos.php";
+                 </script>';
         }else{
             $fecha = zonaHoraria("Y-m-d H:i:s");
             $random = rand(1000, 9999);
@@ -59,10 +58,8 @@
                     window.open("imprimirpdf.php?id="+'.$random.'+"&monto="+'.$cantidadCobrar.'+"&horas="+'.$horas.');
                     location.href="elegirtutor.php"; 
                     </script>';
-            }
-            
+            } 
         }
-
     }
 ?>
 
@@ -119,11 +116,28 @@
                 <option value="5">5 Hora</option>
             </select>
 
+            <label>Materia</label>
+            <select name="materias">
+            <?php
+                $traerMateriasTutor = $pdo->prepare('SELECT materias.nombre, materias.materia_id FROM materias, materiatutor WHERE materias.materia_id=materiatutor.materia_id AND materiatutor.tutor_id=:tutor_id');
+                $traerMateriasTutor->bindParam(':tutor_id',$_SESSION['tutorId']);
+                $traerMateriasTutor->execute();
+
+                foreach($traerMateriasTutor as $valor){
+                    echo '<option value="'.$valor['materia_id'].'">'.$valor['nombre'].'</option>';
+                }
+            ?>
+            </select>
+
+
             <input type="submit" value="pagar Tutoria" name="enviar">
             
         </div>
-    
     </form>
+
+    
+
+    
 
     
 </body>

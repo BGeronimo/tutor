@@ -113,7 +113,7 @@
             $visto->bindParam(':texto',$_POST['texto']);
             $visto->execute();
 
-            $actualizarSesion = $pdo->prepare('UPDATE calificaciones SET sesion=0 WHERE tutor_id=:tutor_id AND alumno_id=:alumno_id AND sesion=1');
+            $actualizarSesion = $pdo->prepare('UPDATE calificaciones SET sesion=3 WHERE tutor_id=:tutor_id AND alumno_id=:alumno_id AND sesion=1');
             $actualizarSesion->bindParam(':tutor_id',$_SESSION['user_id']);
             $actualizarSesion->bindParam(':alumno_id',$alumnoid);
             $actualizarSesion->execute();

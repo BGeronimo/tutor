@@ -196,7 +196,7 @@
 																			<div class="visit">Seleccionar</div>
 																		</div>
 																		<div class="table-row">
-																			<div class="country"> <img style="height: 170px;" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
+																			<div class="country"> <img style="height: 170rem;" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
 																			<div class="visit primary-checkbox">
 																				<input type="checkbox" name="materia[]" value="'.$row['id'].'" id="default-checkbox'.$contadorMateria.'">
 																				<label for="default-checkbox'.$contadorMateria.'"></label>
@@ -225,9 +225,6 @@
 																	<div class="country">Materia(s)</div>
 																	
 																</div>
-
-																
-																	
 																<?php
 																	while($row = $traerMateriasAsignadas->fetch(PDO::FETCH_ASSOC)){
 																		echo '
@@ -242,8 +239,6 @@
 																		</form>';
 																	}
 																	?>
-																
-																
 															</div>
 														</div>	
 											</div>

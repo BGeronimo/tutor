@@ -202,14 +202,14 @@
 								<span>Hola, '.$correo.'</span>                              	
 							</h4>
 							<p style="color: white;">
-								@User2 te ha enviado el siguiente mensaje:
+							'.$separado[1].' te ha enviado el siguiente mensaje:
 							</p>
 							<div>
 								<div class="sidebar-widgets">
 									<div class="widget-wrap">
 										<div class="single-sidebar-widget user-info-widget">
-										<img style="height: 100px;" src="./imagentutor/'.$separado[7].'">
-											<a href=""><h4 style="color: black;">'.$separado[3].', '.$separado[4].'</h4></a>
+										<img style="height: 100px;" src="./imagentutor/'.$separado[8].'">
+											<a href=""><h4 style="color: black;">'.$separado[4].', '.$separado[5].'</h4></a>
 											
 											<div class="star">
 												<span class="fa fa-star checked"></span>
@@ -220,7 +220,7 @@
 											</div>	
 											<br>
 											<p>
-											'.$separado[1].'
+											'.$separado[2].'
 											</p>
 										</div>
 									</div>
@@ -228,7 +228,7 @@
 							</div>
 							<input type="text" name="idMensaje" value="'.$mensajeid.'" hidden="true">
 							<div class="text-center">
-								<input type="text" name="idperfil" value="'.$separado[2].'" hidden="true">
+								<input type="text" name="idperfil" value="'.$separado[3].'" hidden="true">
 								<input class="price-btn col-lg-5" type="submit" value="Ir al perfil" name="perfil">
 								<input class="price-btn col-lg-5" type="submit" value="Enterado" name="enterado">
 							</div>
@@ -356,13 +356,6 @@
 
 			}
 		?>
-
-
-
-
-
-
-
 			<!---->						
 
 					<!---->																															

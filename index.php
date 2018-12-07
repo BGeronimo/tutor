@@ -10,7 +10,7 @@
         foreach($traerAlumnos as $valor){
             if($valor['cuantos']>0 && password_verify($_POST['password'], $valor['pass'])){
                 $_SESSION['user_id'] = $valor['id'];
-                header('Location: homealumno2.php');
+                header('Location: homealumno.php');
                 $encontrado = 1;
             }
         }
