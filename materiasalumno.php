@@ -127,9 +127,9 @@
 						  </div>
 						  <nav id="nav-menu-container">
 							<ul class="nav-menu">
-							  <li class="activo"><a href="homealumno.php">Inicio</a></li>
+							  <li><a href="homealumno.php">Inicio</a></li>
 							  <li><a href="actualizaralumno.php">Mi Cuenta</a></li>
-							  <li><a href="materiasalumno.php">Materias</a></li>
+							  <li class="activo"><a href="materiasalumno.php">Materias</a></li>
 							  <!-- 
 							  <li><a href="hotels.html">Pupilos</a></li>
 							  <li><a href="insurance.html">Cobrar Puntos</a></li>
@@ -196,7 +196,7 @@
 																			<div class="visit">Seleccionar</div>
 																		</div>
 																		<div class="table-row">
-																			<div class="country"> <img style="height: 170rem;" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
+																			<div class="country"> <img class="imgPerfil" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
 																			<div class="visit primary-checkbox">
 																				<input type="checkbox" name="materia[]" value="'.$row['id'].'" id="default-checkbox'.$contadorMateria.'">
 																				<label for="default-checkbox'.$contadorMateria.'"></label>
@@ -230,7 +230,7 @@
 																		echo '
 																		<form action="materiasalumno.php" method="post">
 																			<div class="table-row">
-																				<div class="country"> <img style="height: 170px;" alt="Card image cap" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
+																				<div class="country"> <img class="imgPerfil" alt="Card image cap" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
 																				<div>
 																					<input type="text" name="materia_id" value="'.$row['id'].'" hidden="true">
 																					<input type="submit" class="primary-btn" value="desligar" class="btn btn-secondary" name="desligar">

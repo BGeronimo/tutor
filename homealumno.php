@@ -193,7 +193,6 @@
 
 				if($separado[0]==1){          
 				echo '
-				
 				<div class="col-lg-4">
 					<div class="single-destinations">
 					<form action="homealumno.php" method="post">
@@ -208,7 +207,7 @@
 								<div class="sidebar-widgets">
 									<div class="widget-wrap">
 										<div class="single-sidebar-widget user-info-widget">
-										<img style="height: 100px;" src="./imagentutor/'.$separado[8].'">
+										<img class="imgPerfil" src="./imagentutor/'.$separado[8].'">
 											<a href=""><h4 style="color: black;">'.$separado[4].', '.$separado[5].'</h4></a>
 											
 											<div class="star">
@@ -252,7 +251,8 @@
 						$apellidos = $valor['apellidos'];
 						$email = $valor['email'];
 					}
-
+					$traerCalificacion = $pdo->query('SELECT COUNT(calificacion) as numero, TRUNCATE( AVG(calificacion),0) as promediotruncate, TRUNCATE( AVG(calificacion),2) as promedio FROM calificaciones WHERE tutor_id = '.$separado[2].' AND calificacion!=0');
+					$traerImagen = $pdo->query('SELECT imagenperfil FROM tutores WHERE tutor_id='.$separado[2].'');
 					echo '
 						<div class="col-lg-4">
 						<div class="single-destinations">
@@ -267,18 +267,95 @@
 								<div>
 									<div class="sidebar-widgets">
 										<div class="widget-wrap">
-											<div class="single-sidebar-widget user-info-widget">
-												<img src="img/blog/user-info.png" alt="">
-												<a href="#"><h4 style="color: black;">'.$nombres.', '.$apellidos.'</h4></a>
+											<div class="single-sidebar-widget user-info-widget">';
+											foreach($traerImagen as $valor){
+												if($valor['imagenperfil'] == ''){
+													echo '<img src="./img/profile.png" class="imgPerfil" alt="">';
+												}else{
+													echo '<img src="./imagentutor/'.$valor['imagenperfil'].'" class="imgPerfil" alt="">';
+												}
+											}
+												
+								echo'			<a href="#"><h4 style="color: black;">'.$nombres.', '.$apellidos.'</h4></a>';
 
-												<div class="star">
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star"></span>				
-												</div>	
-												<br>
+																
+												foreach($traerCalificacion as $valor){
+													if($valor['numero']==0){
+														echo '<p>Aun no ha sido calificado</p>';
+														echo '
+														<div class="star">
+															<span class="fa fa-star"></span>
+															<span class="fa fa-star"></span>
+															<span class="fa fa-star"></span>
+															<span class="fa fa-star"></span>
+															<span class="fa fa-star"></span>				
+														</div>
+														';
+													}else{
+														
+														echo '<p> calificacion: '.$valor['promedio'].'</p>';
+														$numero = $valor['promediotruncate'];
+														switch ($numero) {
+															case 1:
+																echo ' 
+																<div class="star">
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star"></span>
+																	<span class="fa fa-star"></span>
+																	<span class="fa fa-star"></span>
+																	<span class="fa fa-star"></span>				
+																</div>
+																';
+																break;
+															case 2:
+																echo '
+																<div class="star">
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star"></span>
+																	<span class="fa fa-star"></span>
+																	<span class="fa fa-star"></span>				
+																</div>
+																';
+																break;
+															case 3:
+																echo '
+																<div class="star">
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star"></span>
+																	<span class="fa fa-star"></span>				
+																</div>
+																';
+																break;
+															case 4:
+																echo '
+																<div class="star">
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star"></span>				
+																</div>
+																';
+																break;
+															case 5:
+																echo '
+																<div class="star">
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>
+																	<span class="fa fa-star checked"></span>				
+																</div>
+																';
+																break;
+														}
+													}
+												}
+													
+								echo'			<br>
 												<p>
 												'.$separado[1].'
 												</p>
@@ -318,7 +395,7 @@
 							<div class="sidebar-widgets">
 								<div class="widget-wrap">
 									<div class="single-sidebar-widget user-info-widget">
-									<img src="./imagentutor/'.$valor['imagen'].'" style="height: 100px;">
+									<img src="./imagentutor/'.$valor['imagen'].'" class="imgPerfil">
 										<a href="#"><h4 style="color: black;">'.$valor['nombre'].' '.$valor['apellido'].'</h4></a>
 										<p>[Fecha de la tutoría]</p>
 										<form action="">
@@ -348,10 +425,7 @@
 					</div>
 					</form>
 				</div>
-			</div>
-				
-				
-				';
+			</div>';
 
 
 			}

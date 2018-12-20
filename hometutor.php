@@ -52,11 +52,11 @@
         $agregarNuevoAlumno->bindParam(':firebase_id',$_SESSION['firebase_id']);
         $agregarNuevoAlumno->execute();
 
-        $traerNuevoAlumno = $pdo->prepare('SELECT tutor_id as id FROM alumnos WHERE email=:email');
+        $traerNuevoAlumno = $pdo->prepare('SELECT alumno_id as id FROM alumnos WHERE email=:email');
         $traerNuevoAlumno->bindParam(':email',$_SESSION['email']);
         $traerNuevoAlumno->execute();
 
-        foreach($traerNuevoTutor as $valor){
+        foreach($traerNuevoAlumno as $valor){
             $_SESSION['user_id'] = $valor['id'];
             header('Location: actualizaralumno.php');
         }

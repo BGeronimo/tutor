@@ -301,28 +301,80 @@
                 echo '<div>';
                 echo '<label>Grado academico</label>';
                 echo '<select name="gradoAcademico">';
-                if($row['datoscompletos'] == 1){
-                    echo '<option selected="true" disabled="disabled">'.$row['gradoAcademico'].'</option>';
+                switch($row['gradoAcademico']){
+                    case "primaria":
+                    echo '  <option value="primaria" selected>Primaria</option>
+                            <option value="basicos">Básicos</option>
+                            <option value="diversificado">Diversificado</option>
+                            <option value="universitario">Universitario</option>';
+                    break;
+                    case "basicos":
+                    echo '  <option value="primaria">Primaria</option>
+                            <option value="basicos" selected>Básicos</option>
+                            <option value="diversificado">Diversificado</option>
+                            <option value="universitario">Universitario</option>';
+                    break;
+                    case "diversificado":	
+                        echo '  <option value="primaria">Primaria</option>
+                                <option value="basicos">Básicos</option>
+                                <option value="diversificado" selected>Diversificado</option>
+                                <option value="universitario">Universitario</option>';
+                    break;
+                    case "universitario":
+                    echo '  <option value="primaria">Primaria</option>
+                            <option value="basicos">Básicos</option>
+                            <option value="diversificado">Diversificado</option>
+                            <option value="universitario" selected>Universitario</option>';
+                    break;
+                    default:
+                    echo '  <option value="primaria">Primaria</option>
+                            <option value="basicos">Básicos</option>
+                            <option value="diversificado">Diversificado</option>
+                            <option value="universitario">Universitario</option>';
+
                 }
-                echo '<option value="primaria">Primaria</option>';
-                echo '<option value="basicos">Basicos</option>';
-                echo '<option value="diversificado">Diversificado</option>';
-                echo '<option value="maestria">Maestria</option>';
-                echo '<option value="doctorado">Doctorado</option>';
                 echo '</select>';
                 echo '</div>';
                 echo '<div>';
                 echo '<label>Con que categoria se familiariza mas para dar clases?</label>';
                 echo '<select name="edadAlumnos">';
-                if($row['datoscompletos'] == 1){
-                    echo '<option selected="true" disabled="disabled">'.$row['edadAlumnos'].'</option>';
+
+                switch($row['edadAlumnos']){
+                    case "primaria":
+                    echo '  <option value="primaria" selected>Primaria</option>
+                            <option value="basicos">Básicos</option>
+                            <option value="diversificado">Diversificado</option>
+                            <option value="universitario">Universitario</option>';
+                    break;
+                    case "basicos":
+                    echo '  <option value="primaria">Primaria</option>
+                            <option value="basicos" selected>Básicos</option>
+                            <option value="diversificado">Diversificado</option>
+                            <option value="universitario">Universitario</option>';
+                    break;
+                    case "51-64":	
+                        echo '  <option value="primaria">Primaria</option>
+                                <option value="basicos">Básicos</option>
+                                <option value="diversificado" selected>Diversificado</option>
+                                <option value="universitario">Universitario</option>';
+                    break;
+                    case "65--":
+                        echo '<option value="4-11">de 4 a 11 (niños)</option>';
+                        echo '<option value="12-17">de 12 a 17 (adolescentes)</option>';
+                        echo '<option value="18-35">de 18 a 35 (jovenes)</option>';
+                        echo '<option value="36-50">de 36 a 50 (adultos)</option>';
+                        echo '<option value="51-64">de 51 a 64 (adultos mayores)</option>';
+                        echo '<option value="65--" selected>de 65 en adelante (tercera edad)</option>';
+                    break;
+                    default:
+                        echo '<option value="4-11">de 4 a 11 (niños)</option>';
+                        echo '<option value="12-17">de 12 a 17 (adolescentes)</option>';
+                        echo '<option value="18-35">de 18 a 35 (jovenes)</option>';
+                        echo '<option value="36-50">de 36 a 50 (adultos)</option>';
+                        echo '<option value="51-64">de 51 a 64 (adultos mayores)</option>';
+                        echo '<option value="65--">de 65 en adelante (tercera edad)</option>';
+
                 }
-                echo '<option value="4-11">de 4 a 11 (niños)</option>';
-                echo '<option value="12-17">de 12 a 17 (adolescentes)</option>';
-                echo '<option value="18-35">de 18 a 35 (jovenes)</option>';
-                echo '<option value="36-50">de 36 a 50 (adultos)</option>';
-                echo '<option value="51-64">de 51 a 64 (adultos mayores)</option>';
-                echo '<option value="65--">de 65 en adelante (tercera edad)</option>';
                 echo '</select>';
                 echo '</div>';
                 echo '<div>';

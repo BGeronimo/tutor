@@ -17,7 +17,7 @@
 
         if($sizeImagen<3000000){
             if($tipoImagen == "image/jpeg" || $tipoImagen == "image/jpg" || $tipoImagen == "image/png"){
-                $lugarGuardado = $_SERVER['DOCUMENT_ROOT'].'/tutoeri/proyecto-master/imagenalumno/';
+				$lugarGuardado = 'imagenalumno/';
                 switch($tipoImagen){
                     case "image/jpeg":
                         move_uploaded_file($_FILES['imagen']['tmp_name'],$lugarGuardado.$nombreImagen.'.jpeg');
@@ -170,8 +170,8 @@
 						  </div>
 						  <nav id="nav-menu-container">
 							<ul class="nav-menu">
-							  <li class="activo"><a href="homealumno.php">Inicio</a></li>
-							  <li><a href="actualizaralumno.php">Mi Cuenta</a></li>
+							  <li><a href="homealumno.php">Inicio</a></li>
+							  <li class="activo"><a href="actualizaralumno.php">Mi Cuenta</a></li>
 							  <li><a href="materiasalumno.php">Materias</a></li>
 							  <!-- 
 							  <li><a href="hotels.html">Pupilos</a></li>
@@ -250,9 +250,9 @@
 													    <?php
 														while($row = $imagen->fetch(PDO::FETCH_ASSOC)){
 															if(empty($row['imagenperfil'])){
-																echo '<img style="height: 150px;"  src="./imagenalumno/sinfoto.png">';
+																echo '<img class="imgPerfil"  src="./imagenalumno/sinfoto.png">';
 															}else{
-																echo '<img style="height: 150px;"  src="./imagenalumno/'.$row['imagenperfil'].'">';
+																echo '<img class="imgPerfil"  src="./imagenalumno/'.$row['imagenperfil'].'">';
 															}
 															
 														}
@@ -317,15 +317,39 @@
 																<div class="icon"><i class="fa fa-graduation-cap" aria-hidden="true"></i></div>
 																<div class="form-select" id="default-select">
 																	<select name="gradoAcademico">';
-																if($row['datoscompletos'] == 1){
-																	echo '<option selected="true" disabled="disabled">'.$row['gradoacademico'].'</option>';
-																}
-																	echo '<option value="primaria">Primaria</option>
+																switch($row['gradoacademico']){
+																	case "primaria":
+																	echo '  <option value="primaria" selected>Primaria</option>
 																			<option value="basicos">Básicos</option>
 																			<option value="diversificado">Diversificado</option>
-																			<option value="universitario">Universitario</option>
-																			<option value="1">...</option>
-																		</select>
+																			<option value="universitario">Universitario</option>';
+																	break;
+																	case "basicos":
+																	echo '  <option value="primaria">Primaria</option>
+																			<option value="basicos" selected>Básicos</option>
+																			<option value="diversificado">Diversificado</option>
+																			<option value="universitario">Universitario</option>';
+																	break;
+																	case "diversificado":	
+																		echo '  <option value="primaria">Primaria</option>
+																				<option value="basicos">Básicos</option>
+																				<option value="diversificado" selected>Diversificado</option>
+																				<option value="universitario">Universitario</option>';
+																	break;
+																	case "universitario":
+																	echo '  <option value="primaria">Primaria</option>
+																			<option value="basicos">Básicos</option>
+																			<option value="diversificado">Diversificado</option>
+																			<option value="universitario" selected>Universitario</option>';
+																	break;
+																	default:
+																	echo '  <option value="primaria">Primaria</option>
+																			<option value="basicos">Básicos</option>
+																			<option value="diversificado">Diversificado</option>
+																			<option value="universitario">Universitario</option>';
+																}
+																	
+																echo'	</select>
 																	</div>
 																</div>
 

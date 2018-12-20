@@ -171,45 +171,27 @@
 		                </div>
 		            </div>						
 					<div class="row">
-						<div class="col-lg-4">
-							<div class="single-destination relative">
-								<div class="thumb relative">
-									<div class="overlay overlay-bg"></div>
-									<img class="img-fluid" src="img/d1.jpg" alt="">
-								</div>
-								<div class="desc">	
-									<a href="#" class="price-btn">$150</a>			
-									<h4>Mountain River</h4>
-									<p>Paraguay</p>			
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4">
-							<div class="single-destination relative">
-								<div class="thumb relative">
-									<div class="overlay overlay-bg"></div>
-									<img class="img-fluid" src="img/d2.jpg" alt="">
-								</div>
-								<div class="desc">	
-									<a href="#" class="price-btn">$250</a>			
-									<h4>Dream City</h4>
-									<p>Paris</p>			
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4">
-							<div class="single-destination relative">
-								<div class="thumb relative">
-									<div class="overlay overlay-bg"></div>
-									<img class="img-fluid" src="img/d3.jpg" alt="">
-								</div>
-								<div class="desc">	
-									<a href="#" class="price-btn">$350</a>			
-									<h4>Cloud Mountain</h4>
-									<p>Sri Lanka</p>			
-								</div>
-							</div>
-						</div>												
+						<?php 
+							$top = $pdo->query('SELECT * FROM materias ORDER BY horas DESC LIMIT 3');
+							foreach($top as $valor){
+								echo '
+									<div class="col-lg-4">
+										<div class="single-destination relative">
+											<div class="thumb relative">
+												<div class="overlay overlay-bg"></div>
+												<img class="img-fluid" src="imagenmateria/'.$valor['imagenmateria'].'"  alt="">
+											</div>
+											<div class="desc">				
+												<h4>'.$valor['nombre'].'</h4>
+												<p>'.$valor['descripcion'].'</p>			
+											</div>
+										</div>
+									</div>
+								
+								';
+							}
+						?>
+																		
 					</div>
 				</div>	
 			</section>

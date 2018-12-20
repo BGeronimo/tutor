@@ -2,7 +2,7 @@
     function zonaHoraria($formato){
         //VARIABLE PARA EL HORARIO
         //$config=sql("SELECT * FROM configuracion WHERE nombre='config_zona_horaria'",SQL_SIMPLE);
-        $horas = 7;
+        $horas = 6;
         // SELECT TIME ZONE
         $sign = "-"; // Whichever direction from GMT to your timezone.
         $h = $horas; // Hour for time zone goes here e.g. +8 or -4, just remove the + or -

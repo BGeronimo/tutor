@@ -1,61 +1,3 @@
-<?php
-    require_once 'conection.php';
-    session_start();
-
-    $traerTutor = $pdo->prepare('SELECT *  FROM tutores WHERE tutor_id=:tutor_id');
-    $traerTutor->bindParam(':tutor_id', $_SESSION['user_id']);
-    $traerTutor->execute();
-
-    //prueba
-    $traerMateriasDisponibles = $pdo->prepare('SELECT materias.materia_id as id, materias.nombre as nombre, materias.descripcion as descripcion, materias.imagenmateria as imagen 
-    FROM materias WHERE materias.materia_id NOT IN(SELECT materiatutor.materia_id 
-    FROM materiatutor WHERE materias.materia_id =materiatutor.materia_id AND  materiatutor.tutor_id = :tutor_id)');
-    $traerMateriasDisponibles->bindParam(':tutor_id',$_SESSION['user_id']);
-    $traerMateriasDisponibles->execute();
-
-    $traerMateriasAsignadas = $pdo->prepare('SELECT materias.materia_id as id, materias.nombre as nombre, materias.descripcion as descripcion, materias.imagenmateria as imagen 
-    FROM materias WHERE materias.materia_id IN(SELECT materiatutor.materia_id 
-    FROM materiatutor WHERE materias.materia_id =materiatutor.materia_id AND  materiatutor.tutor_id = :tutor_id)');
-    $traerMateriasAsignadas->bindParam(':tutor_id',$_SESSION['user_id']);
-    $traerMateriasAsignadas->execute();
-    /////
-
-
-    if(isset($_POST['escogerMateria'])){
-        $contador = count($_POST['materia']);
-        if($contador>0){
-            $base = "";
-            $vuelta = 0;
-            foreach($_POST['materia'] as $valor){
-                $vuelta +=1; 
-                if($contador>1){
-                    if($contador==$vuelta){
-                        $base .= "(".$valor.",".$_SESSION['user_id'].")";
-                    }else{
-                        $base .= "(".$valor.",".$_SESSION['user_id']."),";
-                    }
-                }else{
-                    $base = "(".$valor.",".$_SESSION['user_id'].")";
-                }
-            }
-            $escogerMateria = $pdo->query('INSERT INTO materiatutor (materia_id, tutor_id) VALUES '.$base.'');
-            header('Location: materiastutor.php');
-        }else{
-            echo 'elige una o mas materias primero';
-        }
-    }
-
-    if(isset($_POST['desligar'])){
-        $borrarMateriaTutor = $pdo->prepare('DELETE FROM materiatutor WHERE tutor_id=:tutor_id AND materia_id=:materia_id');
-        $borrarMateriaTutor->bindParam(':materia_id', $_POST['materia_id']);
-        $borrarMateriaTutor->bindParam(':tutor_id', $_SESSION['user_id']);
-        if($borrarMateriaTutor->execute()){
-            header('Location: materiastutor.php');
-        }
-    }
-?>
-
-
 	<!DOCTYPE html>
 	<html lang="zxx" class="no-js">
 	<head>
@@ -72,7 +14,7 @@
 		<!-- meta character set -->
 		<meta charset="UTF-8">
 		<!-- Site Title -->
-		<title>Materias | Tutoeri</title>
+		<title>Inicio | Tutoeri</title>
 
 		<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
 			<!--
@@ -89,72 +31,61 @@
 			<link rel="stylesheet" href="css/main.css">
 		</head>
 		<body>	
-			<!---->
-		<header id="header">
-				<?php
-				$correo = "";
-				while($row = $traerTutor->fetch(PDO::FETCH_ASSOC)){
-					if($row['datoscompletos'] == 0){
-						echo '
-						<div class="header-top">
-							<div class="container">
-							<div class="row align-items-center">
-								<div class="col-lg-6 col-sm-6 col-6 header-top-left">
-									<ul>
-                                        <li><a >['.$row[puntos].'] Puntos</a></li>
-									</ul>			
-								</div>
-							</div>			  					
-							</div>
-						</div>
-						';
-					}else{
-						//si tiene los datos completos
-						echo '
-						<div class="header-top">
-						<div class="container">
-						  <div class="row align-items-center">
-							  <div class="col-lg-6 col-sm-6 col-6 header-top-left">
-								  <ul>
-                                      <li><a href="">['.$row['puntos'].'] Puntos</a></li>
-								  </ul>			
-							  </div>
-							<div class="col-lg-6 col-sm-6 col-6 header-top-right">
-								<ul>
-									<li>
-										<a href="pedircheque.php">Pedir Cheque</a>
-									</li>
-								</ul>
-							</div>
-						  </div>			  					
-						</div>
-					</div>
-					<div class="container main-menu">
-						<div class="row align-items-center justify-content-between d-flex">
-						  <div id="logo">
-							<a href="index.html"><img src="img/logo.png" alt="" title="" /></a>
-						  </div>
-						  <nav id="nav-menu-container">
-							<ul class="nav-menu">
-							  <li class="activo"><a href="hometutor.php">Inicio</a></li>
-							  <li><a href="actualizartutor.php">Mi Cuenta</a></li>
-							  <li><a href="materiastutor.php">Materias</a></li>
-							  
-							  <li><a href="pupilos.php">Pupilos</a></li>
-							  <li><a href="cobropuntos.php">Cobrar Puntos</a></li>
-							  			          					          		          
-							  <li style="border: 1px dashed white; border-radius: 3px;"><a href="logout.php" onClick="logOut();">Salir</a></li>
+			<header id="header">
+				<div class="header-top">
+					<div class="container">
+			  		<div class="row align-items-center">
+			  			<div class="col-lg-6 col-sm-6 col-6 header-top-left">
+			  				<ul>
+			  					<li><a href="#">[100] Puntos</a></li>
+			  					<li class="activoDos"><a href="#">Comprar Puntos</a></li>
+			  				</ul>			
+			  			</div>
+			  			<div class="col-lg-6 col-sm-6 col-6 header-top-right">
+							<ul>
+								<li>
+									<a href="#">Pedir Cheque</a>
+								</li>
 							</ul>
-						  </nav><!-- #nav-menu-container -->					      		  
-						</div>
+			  			</div>
+			  		</div>			  					
 					</div>
-						';
-
-					}
-					$correo = $row['email'];
-				}
-				?>
-
+				</div>
+				<div class="container main-menu">
+					<div class="row align-items-center justify-content-between d-flex">
+				      <div id="logo">
+				        <a href="index.html"><img src="img/logo.png" alt="" title="" /></a>
+				      </div>
+				      <nav id="nav-menu-container">
+				        <ul class="nav-menu">
+				          <li><a href="homeAlumno.html">Inicio</a></li>
+				          <li><a href="actualizarAlumno.html">Mi Cuenta</a></li>
+				          <li><a href="materiasAlumno.html">Materias</a></li>
+				          <li><a href="hotels.html">Pupilos</a></li>
+				          <li><a href="insurance.html">Cobrar Puntos</a></li>
+				          <li class="menu-has-children"><a href="">Profesores</a>
+				            <ul>
+				              <li><a href="blog-home.html">Elegir Tutor</a></li>
+							  <li><a href="blog-single.html">Mis Tutores</a></li>
+							  <li><a href="blog-single.html">Historial de tutores</a></li>
+				            </ul>
+				          </li>	
+				          <!--<li class="menu-has-children"><a href="">Pages</a>
+				            <ul>
+				            	  <li><a href="elements.html">Elements</a></li>
+						          <li class="menu-has-children"><a href="">Level 2 </a>
+						            <ul>
+						              <li><a href="#">Item One</a></li>
+						              <li><a href="#">Item Two</a></li>
+						            </ul>
+						          </li>					                		
+				            </ul>
+				          </li>	-->				          					          		          
+				          <li style="border: 1px dashed white; border-radius: 3px;"><a href="contact.html">Salir</a></li>
+				        </ul>
+				      </nav><!-- #nav-menu-container -->					      		  
+					</div>
+				</div>
 			</header><!-- #header -->
 			  
 			<!-- start banner Area -->
@@ -164,7 +95,7 @@
 					<div class="row d-flex align-items-center justify-content-center">
 						<div class="about-content col-lg-12">
 							<h1 class="text-white">
-								Materias				
+								Comprar Puntos				
 							</h1>	
 							
 						</div>	
@@ -176,80 +107,65 @@
 			<!-- Start destinations Area -->
 			<section class="destinations-area section-gap">
 				<div class="container">
-		            <div class="">
-							<div class="">
-									<div class="row text-center">
-										<div class="col-md-6 typo-sec">
-											<h2 class="mb-20">Materias Disponibles</h2>
-											<form action="materiastutor.php" method="post">
-											<div class="text-center" style="margin-bottom: 19px;">
-													<input type="submit" value="Asignar" class="primary-btn col-lg-5" class="btn btn-primary" name="escogerMateria">
-											</div>
-												
-														<?php
-														$contadorMateria = 0;
-														while($row = $traerMateriasDisponibles->fetch(PDO::FETCH_ASSOC)){
-															$contadorMateria +=1;
-															echo '
-															<div class="progress-table-wrap">
-																<div class="progress-table">
-																	<div class="table-head">
-																		<div class="country">Materias</div>
-																		<div class="visit">Seleccionar</div>
-																	</div>
-																	<div class="table-row">
-																		<div class="country"> <img class="imgPerfil" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
-																		<div class="visit primary-checkbox">
-																			<input type="checkbox" name="materia[]" value="'.$row['id'].'" id="default-checkbox'.$contadorMateria.'">
-																			<label for="default-checkbox'.$contadorMateria.'"></label>
-																			</div>
-																	</div>
-																</div>
-															</div>
-
-															';
-														}
-														?>
-														
-												</div>
-											</form>
-
-
-
-
-										<div class="col-md-6 mt-sm-30 typo-sec">
-											<h2 class="mb-20">Materias Asignadas</h2>
-
-											<div class="">
-													<div class="progress-table-wrap">
-															<div class="progress-table">
-																<div class="table-head">
-																	<div class="country">Materia(s)</div>
-																	
-																</div>
-																<?php
-																	while($row = $traerMateriasAsignadas->fetch(PDO::FETCH_ASSOC)){
-																		echo '
-																		<form action="materiastutor.php" method="post">
-																			<div class="table-row">
-																				<div class="country"> <img class="imgPerfil" alt="Card image cap" src="./imagenmateria/'.$row['imagen'].'">'.$row['nombre'].'</div>
-																				<div>
-																					<input type="text" name="materia_id" value="'.$row['id'].'" hidden="true">
-																					<input type="submit" class="primary-btn" value="desligar" class="btn btn-secondary" name="desligar">
-																				</div>
-																			</div>
-																		</form>';
-																	}
-																	?>
-															</div>
-														</div>	
-											</div>
-										</div>
-										
+						<form action="#">
+								<div class="mt-10">
+									<input type="text" name="first_name" placeholder="First Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'First Name'" required="" class="single-input">
+								</div>
+								<div class="mt-10">
+									<input type="text" name="last_name" placeholder="Last Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Last Name'" required="" class="single-input">
+								</div>
+								<div class="mt-10">
+									<input type="text" name="last_name" placeholder="Last Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Last Name'" required="" class="single-input">
+								</div>
+								<div class="mt-10">
+									<input type="email" name="EMAIL" placeholder="Email address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email address'" required="" class="single-input">
+								</div>
+								<div class="input-group-icon mt-10">
+									<div class="icon"><i class="fa fa-thumb-tack" aria-hidden="true"></i></div>
+									<input type="text" name="address" placeholder="Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Address'" required="" class="single-input">
+								</div>
+								<div class="input-group-icon mt-10">
+									<div class="icon"><i class="fa fa-plane" aria-hidden="true"></i></div>
+									<div class="form-select" id="default-select">
+										<select style="display: none;">
+											<option value="1">City</option>
+											<option value="1">Dhaka</option>
+											<option value="1">Dilli</option>
+											<option value="1">Newyork</option>
+											<option value="1">Islamabad</option>
+										</select><div class="nice-select" tabindex="0"><span class="current">City</span><ul class="list"><li data-value="1" class="option selected">City</li><li data-value="1" class="option">Dhaka</li><li data-value="1" class="option">Dilli</li><li data-value="1" class="option">Newyork</li><li data-value="1" class="option">Islamabad</li></ul></div>
 									</div>
 								</div>
-		            </div>
-		        </div>						
+								<div class="input-group-icon mt-10">
+									<div class="icon"><i class="fa fa-globe" aria-hidden="true"></i></div>
+									<div class="form-select" id="default-select2">
+										<select style="display: none;">
+											<option value="1">Country</option>
+											<option value="1">Bangladesh</option>
+											<option value="1">India</option>
+											<option value="1">England</option>
+											<option value="1">Srilanka</option>
+										</select><div class="nice-select" tabindex="0"><span class="current">Country</span><ul class="list"><li data-value="1" class="option selected">Country</li><li data-value="1" class="option">Bangladesh</li><li data-value="1" class="option">India</li><li data-value="1" class="option">England</li><li data-value="1" class="option">Srilanka</li></ul></div>
+									</div>
+								</div>
+								
+								<div class="mt-10">
+									<textarea class="single-textarea" placeholder="Message" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Message'" required=""></textarea>
+								</div>
+								<div class="mt-10">
+									<input type="text" name="first_name" placeholder="Primary color" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Primary color'" required="" class="single-input-primary">
+								</div>
+								<div class="mt-10">
+									<input type="text" name="first_name" placeholder="Accent color" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Accent color'" required="" class="single-input-accent">
+								</div>
+								<div class="mt-10">
+									<input type="text" name="first_name" placeholder="Secondary color" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Secondary color'" required="" class="single-input-secondary">
+								</div>
+								<br>
+								<div class="">
+										<a class="btn btn-block btn-primary" href="comprarPuntosDos.html">Enviar Transacción</a>
+									</div>
+							</form>
 				</div>	
 			</section>
 			<!-- End destinations Area -->
@@ -453,8 +369,6 @@
 })(jQuery);
 		</script>
 		<style>
-
-
 		.ec-stars-wrapper {
 	/* Espacio entre los inline-block (los hijos, los `a`) 
 	   http://ksesocss.blogspot.com/2012/03/display-inline-block-y-sus-empeno-en.html */
@@ -487,6 +401,14 @@
 	border: 1px outset #288894;
     border-radius: 3px;
     background: linear-gradient(#3D9F97, #00548F);
+}
+
+.activoDos{
+	color: #ffffff;
+    border: 1px solid #ffffff;
+    background: #3D9F97;
+    border-radius: 3px;
+    padding: 1px 5px;
 }
 		</style>
 	</html>

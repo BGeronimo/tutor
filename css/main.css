@@ -207,7 +207,9 @@ h6, .h6 {
 }
 
 td, th {
-  border-radius: 0px;
+  border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;  
 }
 
 /**
@@ -1218,8 +1220,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .generic-blockquote {
   padding: 30px 50px 30px 30px;
-  background: #fff;
-  border-left: 2px solid #00548F;
+  background: #edf3fd;
+  border-left: 3px solid #3c9f97;
+  border-radius: 3px;
 }
 
 @media (max-width: 991px) {
@@ -1774,10 +1777,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .disabled-checkbox {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  background: #fff;
+  width: 25px;
+  height: 25px;
+  border-radius: 0px;
+  background: #fafaff;
   position: relative;
   cursor: pointer;
 }
@@ -2320,9 +2323,9 @@ h1, h2, h3, h4, h5, h6 {
 #mobile-nav ul li a {
   color: #fff;
   font-size: 13px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   overflow: hidden;
-  padding: 10px 22px 10px 15px;
+  padding: 10px 15px 10px 25px;
   position: relative;
   text-decoration: none;
   width: 100%;
@@ -3360,11 +3363,123 @@ body.mobile-nav-active #mobile-nav-toggle {
   margin-bottom: 5px;
 }
 
+/*perfilTutorDos*/
+.destinations-area .single-destinations .perfilTutorDos {
+  background: transparent;
+  padding: 20px;
+  border-radius: 3px;
+  
+  color: black;
+}
+
+.destinations-area .single-destinations .perfilTutorDos h4 {
+  margin-bottom: 10px;
+  color: white;
+}
+
+.destinations-area .single-destinations .perfilTutorDos .package-list {
+  margin-top: 30px;
+  color: white;
+}
+
+.destinations-area .single-destinations .perfilTutorDos .package-list li {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+
+.destinations-area .single-destinations .perfilTutorDos .package-list li:last-child {
+  border-bottom: none;
+  margin-bottom: 0px;
+}
+
+.destinations-area .single-destinations .perfilTutorDos .price-btn {
+  background: #00548F;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 5px 20px;
+  border: 1px solid white;
+  border-radius: 3px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.destinations-area .single-destinations .perfilTutorDos .price-btn:hover {
+  background: #3D9F97;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 5px 20px;
+  border: 1px solid #3D9F97;
+  border-radius: 3px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+/*perfilTutor*/
+.destinations-area .single-destinations .perfilTutor {
+  background: transparent;
+  padding: 20px;
+  border-radius: 3px;
+  border: 3px solid #edf3fd;
+  color: black;
+}
+
+.destinations-area .single-destinations .perfilTutor h4 {
+  margin-bottom: 10px;
+  color: white;
+}
+
+.destinations-area .single-destinations .perfilTutor .package-list {
+  margin-top: 30px;
+  color: white;
+}
+
+.destinations-area .single-destinations .perfilTutor .package-list li {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+
+.destinations-area .single-destinations .perfilTutor .package-list li:last-child {
+  border-bottom: none;
+  margin-bottom: 0px;
+}
+
+.destinations-area .single-destinations .perfilTutor .price-btn {
+  background: #00548F;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 5px 20px;
+  border: 1px solid white;
+  border-radius: 3px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.destinations-area .single-destinations .perfilTutor .price-btn:hover {
+  background: #3D9F97;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 5px 20px;
+  border: 1px solid #3D9F97;
+  border-radius: 3px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+
+
 /*perfil*/
 .imgPerfil{
   border-radius: 50%;
   width: 35%;
   /*height: 60%;*/
+}
+
+.imgPerfilDos{
+  border-radius: 50%;
+  width: 100%;
+  height: 65%;
 }
 
 .destinations-area .single-destinations .perfil {
@@ -3754,7 +3869,7 @@ body.mobile-nav-active #mobile-nav-toggle {
 .widget-wrap {
   background: #f9f9ff;
   padding: 5px 0px;
-  /* border: 1px solid #eee; */
+  border: 3px solid #edf3fd;
   border-radius: 3px;
 }
 
@@ -3907,12 +4022,13 @@ body.mobile-nav-active #mobile-nav-toggle {
   color: #fff;
   text-align: center;
   padding: 12px 0px;
+  border-radius: 3px;
 }
 
 .widget-wrap .post-category-widget .cat-list li {
   padding-top: 15px;
   padding-bottom: 8px;
-  border-bottom: 2px dotted #eee;
+  border-bottom: 1px ridge #edf3fd;
   -webkit-transition: all 0.3s ease 0s;
   -moz-transition: all 0.3s ease 0s;
   -o-transition: all 0.3s ease 0s;
@@ -4188,9 +4304,10 @@ body.mobile-nav-active #mobile-nav-toggle {
 
 .comments-area {
   background: #fafaff;
-  border: 1px solid #eee;
-  padding: 50px 20px;
-  margin-top: 50px;
+  border: 3px solid #edf3fd;
+  padding: 50px 85px;
+  /*margin-top: 50px;*/
+  border-radius: 3px;
 }
 
 @media (max-width: 414px) {
@@ -4205,11 +4322,12 @@ body.mobile-nav-active #mobile-nav-toggle {
 }
 
 .comments-area a {
-  color: #222;
+  color: #01548f;
 }
 
 .comments-area .comment-list {
   padding-bottom: 30px;
+  padding: 5px 25px;
 }
 
 .comments-area .comment-list:last-child {
@@ -4228,7 +4346,7 @@ body.mobile-nav-active #mobile-nav-toggle {
     font-size: 11px;
   }
   .comments-area .comment-list .single-comment .comment {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
@@ -4238,7 +4356,7 @@ body.mobile-nav-active #mobile-nav-toggle {
 
 .comments-area .date {
   font-size: 13px;
-  color: #cccccc;
+  color: #3c9f97;
 }
 
 .comments-area .comment {

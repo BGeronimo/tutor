@@ -1,21 +1,6 @@
-<?php   
-    require_once 'conection.php';
-    session_start();
-
-    $traerMaterias = $pdo->query('SELECT * FROM materias');
-
-
-    if(isset($_POST['actualizar'])){
-        $_SESSION['materiaId'] = $_POST['id'];
-        header('location: actualizarmateria.php?id='.$_POST['id']);
-    }
-?>
-
-
-<!DOCTYPE html>
+	<!DOCTYPE html>
 	<html lang="zxx" class="no-js">
 	<head>
-		
 		<!-- Mobile Specific Meta -->
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<!-- Favicon-->
@@ -29,11 +14,7 @@
 		<!-- meta character set -->
 		<meta charset="UTF-8">
 		<!-- Site Title -->
-		<title>Materias | Tutoeri</title>
-		<!-- Autenticacion con firebase -->
-		<script type="text/javascript" src="auth.js"></script>
-
-		<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
+		<title>Materias Admin | Tutoeri</title>
 
 		<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
 			<!--
@@ -49,12 +30,8 @@
 			<link rel="stylesheet" href="css/owl.carousel.css">				
 			<link rel="stylesheet" href="css/main.css">
 		</head>
-		
-		<body>
-
-
-		<!---->
-		<header id="header">
+		<body>	
+			<header id="header">
 				
 				<div class="container main-menu">
 					<div class="row align-items-center justify-content-between d-flex">
@@ -63,16 +40,16 @@
 				      </div>
 				      <nav id="nav-menu-container">
 				        <ul class="nav-menu">
-				          <li ><a href="homeadministrador.php">Inicio</a></li>
-				          <li class="activo"><a href="materias.php">Materias</a></li>
-				          <li><a href="pagartutor.php">Pagar a Tutor</a></li>	          					          		          
-				          <li style="border: 1px dashed white; border-radius: 3px;"><a href="logout.php" onClick="logOut();">Salir</a></li>
+				          <li ><a href="homeAdmin.html">Inicio</a></li>
+				          <li class="activo"><a href="actualizarAlumno.html">Materias</a></li>
+				          <li><a href="pagarTutor.html">Pagar a Tutor</a></li>	          					          		          
+				          <li style="border: 1px dashed white; border-radius: 3px;"><a href="#">Salir</a></li>
 				        </ul>
 				      </nav><!-- #nav-menu-container -->					      		  
 					</div>
 				</div>
 			</header><!-- #header -->
-
+			  
 			<!-- start banner Area -->
 			<section class="about-banner relative">
 				<div class="overlay overlay-bg"></div>
@@ -83,7 +60,7 @@
 					</div>
 				</div>
 			</section>
-			<!-- End banner Area -->
+			<!-- End banner Area -->	
 
 			<!-- Start destinations Area -->
 			<section class="destinations-area section-gap">
@@ -91,97 +68,118 @@
 		            <div class="row d-flex justify-content-center">
 		                <div class="menu-content pb-40 col-lg-8">
 		                    <div class="title text-center">
-								<h1 class="mb-10">Materias</h1>
-								<p>Estas son las materias disponibles</p>
+														<h1 class="mb-10">Materias</h1>
+														<p>Estas son las materias disponibles</p>
 		                    </div>
 		                </div>
-					</div>
+		            </div>						
 					<div class="row d-flex justify-content-center">
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
 						
-						<?php
-						foreach($traerMaterias as $valor){
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
 
-							echo '
-							
-								<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
-									<div class="card-body">
-										<h5 class="card-title">'. $valor['nombre'] .'</h5>
-										<p class="card-text">'. $valor['descripcion'] .'</p>
-										<input type="text" value="'.$valor['materia_id'].'" hidden="true">
-										<button class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg" onClick="boton();" id="'.$valor['materia_id'].'">Actualizar</button>
-									</div>
-								</div>
-							';
+						<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
+							<div class="card-body">
+								<h5 class="card-title">[TITULO MATERIA]</h5>
+								<p class="card-text">[DESCRIPCION]</p>
+								<a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Actualizar</a>
+							</div>
+						</div>
 
-						}
-						?>
+
 					</div>
-				</div>
+				</div>	
 			</section>
 			<!-- End destinations Area -->
-
-		<!-- start footer Area -->		
-		<footer class="footer-area section-gap">
-			<div class="container">
-
-				<div class="row">
-					<div class="col-lg-4  col-md-6 col-sm-6">
-						<div class="single-footer-widget">
-							<h6>Acerca de Tutoeri</h6>
-							<p>
-								The world has become so fast paced that people don’t want to stand by reading a page of information, they would much rather look at a presentation and understand the message. It has come to a point 
-							</p>
-						</div>
-					</div>
-					<div class="col-lg-4 col-md-6 col-sm-6">
-						<div class="single-footer-widget">
-							<h6>Links</h6>
-							<div class="row">
-								<div class="col">
-									<ul>
-										<li><a href="#">Home</a></li>
-										<li><a href="#">Feature</a></li>
-										<li><a href="#">Services</a></li>
-										<li><a href="#">Portfolio</a></li>
-									</ul>
-								</div>
-								<div class="col">
-									<ul>
-										<li><a href="#">Team</a></li>
-										<li><a href="#">Pricing</a></li>
-										<li><a href="#">Blog</a></li>
-										<li><a href="#">Contact</a></li>
-									</ul>
-								</div>										
-							</div>							
-						</div>
-					</div>							
-					<div class="col-lg-4  col-md-6 col-sm-6">
-						<div class="single-footer-widget">
-							<h6>Redes Sociales</h6>
-							<p>
-								Encuéntranos en nuestras redes sociales para más información.									
-							</p>								
-							<div class=" footer-social">
-									<a href="#"><i class="fa fa-facebook"></i></a>
-									<a href="#"><i class="fa fa-twitter"></i></a>
-									<a href="#"><i class="fa fa-dribbble"></i></a>
-									<a href="#"><i class="fa fa-behance"></i></a>
-								</div>
-						</div>
-					</div>
-										
-				</div>
-
-				<div class="footer-bottom text-center align-items-center">
-					<p class=" footer-text text-center m-0">
-							&copy;	Copyright <script>document.write(new Date().getFullYear());</script> | Todos los derechos reservados.</p>
-					
-				</div>
-			</div>
-		</footer>
-		<!-- End footer Area -->	
 			
+
+			<!-- Start home-about Area -->
+			<!--<section class="home-about-area">
+				<div class="container-fluid">
+					<div class="row align-items-center justify-content-end">
+						<div class="col-lg-6 col-md-12 home-about-left">
+							<h1>
+								Did not find your Package? <br>
+								Feel free to ask us. <br>
+								We‘ll make it for you
+							</h1>
+							<p>
+								inappropriate behavior is often laughed off as “boys will be boys,” women face higher conduct standards especially in the workplace. That’s why it’s crucial that, as women, our behavior on the job is beyond reproach. inappropriate behavior is often laughed.
+							</p>
+							<a href="#" class="primary-btn text-uppercase">request custom price</a>
+						</div>
+						<div class="col-lg-6 col-md-12 home-about-right no-padding">
+							<img class="img-fluid" src="img/hotels/about-img.jpg" alt="">
+						</div>
+					</div>
+				</div>	
+			</section>-->
+			<!-- End home-about Area -->
+
+  
+  		<!-- preloader -->
+		  <div id='preloader'><div class='preloader'></div></div>
+			<!-- /preloader -->
 
 			<!-- Modal -->
 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -273,10 +271,6 @@
     </div>
   </div>
 </div>
-  
-  		<!-- preloader -->
-		  <div id='preloader'><div class='preloader'></div></div>
-		  <!-- /preloader -->
 
 			<script src="js/vendor/jquery-2.2.4.min.js"></script>
 			<script src="js/popper.min.js"></script>
@@ -294,8 +288,6 @@
 			<script src="js/main.js"></script>	
 			<script src="https://cdn.linearicons.com/free/1.0.0/svgembedder.min.js"></script>
 			<link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
-
-            <script type="text/javascript" src="auth.js"></script>
 		</body>
 	
 		<script>
@@ -313,7 +305,6 @@
 	});
 	
 })(jQuery);
-
 		</script>
 		<style>
 		.ec-stars-wrapper {
@@ -351,11 +342,3 @@
 }
 		</style>
 	</html>
-
-
-<script>
-	function boton(){
-	var id = document.getElementById("id").value;
-	localStorage.setItem("id", id);
-	}
-</script>
