@@ -8,7 +8,68 @@
     if(isset($_POST['actualizar'])){
         $_SESSION['materiaId'] = $_POST['id'];
         header('location: actualizarmateria.php?id='.$_POST['id']);
-    }
+	}
+	
+	if(isset($_POST['subirImagen'])){
+        
+        $tipoImagen = $_FILES['imagen']['type'];
+        $nombreImagen = str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789".uniqid());
+        $sizeImagen = $_FILES['imagen']['size'];
+
+        if($sizeImagen<3000000){
+            if($tipoImagen == "image/jpeg" || $tipoImagen == "image/jpg" || $tipoImagen == "image/png"){
+                $lugarGuardado = 'imagenmateria/';
+                switch($tipoImagen){
+                    case "image/jpeg":
+                        move_uploaded_file($_FILES['imagen']['tmp_name'],$lugarGuardado.$nombreImagen.'.jpeg');
+                        $nombreArreglado = $nombreImagen.'.jpeg';
+                    break;
+                    case "image/jpg":
+                        move_uploaded_file($_FILES['imagen']['tmp_name'],$lugarGuardado.$nombreImagen.'.jpg');
+                        $nombreArreglado = $nombreImagen.'.jpg';
+                    break;
+                    case "image/png":
+                        move_uploaded_file($_FILES['imagen']['tmp_name'],$lugarGuardado.$nombreImagen.'.png');
+                        $nombreArreglado = $nombreImagen.'.png';
+                    break;
+				}
+
+				$traerFotoActual = $pdo->query('SELECT imagenmateria FROM materias WHERE materia_id='.$_POST['idMateria'].'');
+				$imagenAntigua = "";
+				foreach($traerFotoActual as $valor){
+					$imagenAntigua = $valor['imagenperfil'];
+				}
+                
+                $actualizarFoto = $pdo->prepare('UPDATE materias SET imagenmateria=:imagenmateria WHERE materia_id=:materia_id');
+                $actualizarFoto->bindParam(':imagenmateria', $nombreArreglado);
+                $actualizarFoto->bindParam(':materia_id', $_POST['idMateria']);
+                if($actualizarFoto->execute()){
+					unlink('./imagentutor/'.$imagenAntigua);
+                    header('Location: materias.php');
+                }
+                
+               
+            }else{
+                echo 'solo se permite subir archivos de tipo .jpeg, .jpg y .png';
+            }
+        }else{
+            echo 'la imagen es demasiado grande';
+        }
+	}
+	
+	if(isset($_POST['datos'])){
+		if(isset($_POST['nombreMateria']) || isset($_POST['descripcion'])){
+			$actualizarDatos = $pdo->prepare('UPDATE materias SET nombre=:nombre, descripcion=:descripcion WHERE materia_id=:materia_id');
+			$actualizarDatos->bindParam(':nombre', $_POST['nombreMateria'] );
+			$actualizarDatos->bindParam(':descripcion', $_POST['descripcion']);
+			$actualizarDatos->bindParam(':materia_id', $_POST['idMateria']);
+			if($actualizarDatos->execute()){
+				header('Location: materias.php');
+			}
+
+
+		}
+	}
 ?>
 
 
@@ -99,18 +160,116 @@
 					<div class="row d-flex justify-content-center">
 						
 						<?php
+						$contador = 0;
 						foreach($traerMaterias as $valor){
+							$contador +=1;
 
 							echo '
-							
 								<div class="card text-center" style="width: 18rem; margin: 3px 3px 3px 3px;">
 									<div class="card-body">
 										<h5 class="card-title">'. $valor['nombre'] .'</h5>
 										<p class="card-text">'. $valor['descripcion'] .'</p>
 										<input type="text" value="'.$valor['materia_id'].'" hidden="true">
-										<button class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg" onClick="boton();" id="'.$valor['materia_id'].'">Actualizar</button>
+										<button class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg'.$contador.'" onClick="boton();" id="'.$valor['materia_id'].'">Actualizar</button>
 									</div>
 								</div>
+
+
+
+
+								<!-- Modal -->
+								<div class="modal fade bd-example-modal-lg'.$contador.'" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+								  <div class="modal-dialog modal-lg" role="document">
+									<div class="modal-content">
+									  <div class="modal-header">
+										<h5 class="modal-title" id="exampleModalLabel">Actualizar [Materia]</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										  <span aria-hidden="true">&times;</span>
+										</button>
+									  </div>
+									  <div class="modal-body">
+										<div class="row">
+													<div class="col-lg-6">
+														<div class="single-destinations">
+															<!--<div class="thumb">
+																<img src="img/hotels/d1.jpg" alt="">
+															</div>-->
+															<div class="perfil text-center">
+																<h4 class=" text-center ">
+																	<span class="text-center">Foto de la materia</span>       
+																</h4>
+																<p style="color: black;">
+																	Elige una imagen para la materia.
+																</p>
+																<div>
+																	<div class="sidebar-widgets" style="padding-bottom: 2px;">
+																		<div class="widget-wrap">
+																			<div class="single-sidebar-widget user-info-widget">
+																				<img class="imgPerfil" src="./imagenmateria/'.$valor['imagenmateria'].'" alt="">
+																				<br>
+																				<form action="materias.php" method="post" enctype="multipart/form-data">
+																					<div class="form-group text-center">
+																						<label for="exampleFormControlFile1"></label>
+																						<input type="file" class="" name="imagen" id="exampleFormControlFile1" style="margin-top: 35px; border: 2px dashed #3b9f97; border-radius: 3px;">
+																						<input type="text" name="idMateria" value="'.$valor['materia_id'].'" hidden="true">
+																					</div>
+																					<div class="text-center">
+																						<input type="submit" value="Guardar Imagen" name="subirImagen" class="btn btn-primary">
+																					</div>
+																				</form>
+																			</div>
+																		</div>
+																	</div>		
+																</div>
+																
+															</div>
+														</div>
+													</div>
+													<div class="col-lg-6">
+														<div class="single-destinations">
+															<!--<div class="thumb">
+																<img src="img/hotels/d2.jpg" alt="">
+															</div>-->
+															<div class="perfil text-center">
+																<h4 class="text-center">
+																	<span class="text-center">información</span>      
+																</h4>
+																<p style="color: black;">
+																	Actualiza la información de la materia.
+																</p>
+																<div>
+																	<div class="sidebar-widgets" style="padding-bottom: 10px;">
+																		<div class="widget-wrap" style="padding: 0px 0px;">
+																			<div class="single-sidebar-widget user-info-widget">
+																				<form action="materias.php" method="post">
+																					<div class="mt-10">
+																						<input type="text" name="nombreMateria" placeholder="Nombre de la materia" value="'.$valor['nombre'].'"  required="" class="single-input">
+																					</div>
+																					<div class="mt-10">
+																						<input type="text" name="descripcion" placeholder="Descripción" value="'.$valor['descripcion'].'" required="" class="single-input">
+																					</div>
+																					<div class="text-center">
+																						<br>
+																						<input type="submit" value="Actualizar Información" class="btn btn-primary" name="datos">
+																					</div>
+																					<input type="text" name="idMateria" value="'.$valor['materia_id'].'" hidden="true">
+																				</form>
+																			</div>
+																		</div>
+																	</div>		
+																</div>
+																
+															</div>
+														</div>
+													</div>
+													
+																																											
+												</div>
+									  </div>
+									</div>
+								  </div>
+								</div>
+
 							';
 
 						}
@@ -182,97 +341,6 @@
 		</footer>
 		<!-- End footer Area -->	
 			
-
-			<!-- Modal -->
-<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Actualizar [Materia]</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-					<div class="col-lg-6">
-						<div class="single-destinations">
-							<!--<div class="thumb">
-								<img src="img/hotels/d1.jpg" alt="">
-							</div>-->
-							<div class="perfil text-center">
-								<h4 class=" text-center ">
-									<span class="text-center">Foto de la materia</span>       
-								</h4>
-								<p style="color: black;">
-									Elige una imagen para la materia.
-								</p>
-								<div>
-									<div class="sidebar-widgets" style="padding-bottom: 2px;">
-										<div class="widget-wrap">
-											<div class="single-sidebar-widget user-info-widget">
-												<img class="imgPerfil" src="img/profile.png" alt="">
-												<br>
-												<form>
-													<div class="form-group text-center">
-														<label for="exampleFormControlFile1"></label>
-														<input type="file" class="" id="exampleFormControlFile1" style="margin-top: 35px; border: 2px dashed #3b9f97; border-radius: 3px;">
-													</div>
-													<div class="text-center">
-														<button type="button" class="btn btn-primary">Guardar Imagen</button>
-													</div>
-												</form>
-											</div>
-										</div>
-									</div>		
-								</div>
-								
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="single-destinations">
-							<!--<div class="thumb">
-								<img src="img/hotels/d2.jpg" alt="">
-							</div>-->
-							<div class="perfil text-center">
-								<h4 class="text-center">
-									<span class="text-center">información</span>      
-								</h4>
-								<p style="color: black;">
-									Actualiza la información de la materia.
-								</p>
-								<div>
-									<div class="sidebar-widgets" style="padding-bottom: 10px;">
-										<div class="widget-wrap" style="padding: 0px 0px;">
-											<div class="single-sidebar-widget user-info-widget">
-												<form action="#">
-													<div class="mt-10">
-														<input type="text" name="nombreMateria" placeholder="Nombre de la materia" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Nombre de la materia'" required="" class="single-input">
-													</div>
-													<div class="mt-10">
-														<input type="text" name="descripcion" placeholder="Descripción" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Descripción'" required="" class="single-input">
-													</div>
-													<div class="text-center">
-														<br>
-														<button type="button" class="btn btn-primary">Actualizar Información</button>
-													</div>
-												</form>
-											</div>
-										</div>
-									</div>		
-								</div>
-								
-							</div>
-						</div>
-					</div>
-					
-																																			
-				</div>
-      </div>
-    </div>
-  </div>
-</div>
   
   		<!-- preloader -->
 		  <div id='preloader'><div class='preloader'></div></div>

@@ -2,7 +2,66 @@
     require_once 'conection.php';
     session_start();
 
-    $traerAlumno = $pdo->query('SELECT *  FROM alumnos WHERE alumno_id='.$_SESSION['user_id'].'');
+	$traerAlumno = $pdo->query('SELECT *  FROM alumnos WHERE alumno_id='.$_SESSION['user_id'].'');
+	
+	if(isset($_POST['enviar'])){
+        if(isset($_POST['correo'])){
+            $traerReceptor = $pdo->prepare('SELECT COUNT(alumnos.alumno_id) as numero, alumnos.alumno_id as id, alumnos.email as email 
+            FROM alumnos WHERE email=:email');
+            $traerReceptor->bindParam(':email',$_POST['correo']);
+            $traerReceptor->execute();
+            $count = 0;
+            $id = 0;
+            $email = "";
+            foreach($traerReceptor as $valor){
+                if($valor['numero']==1){
+                    $count = $valor['numero'];
+                    $id = $valor['id'];
+                    $email = $valor['email'];
+                }
+            }
+
+            if($count>0){
+                //receptor
+                $receptor = "Alumno|".$id;
+
+                $traerEmisor = $pdo->prepare('SELECT email FROM alumnos WHERE alumno_id=:alumno_id');
+                $traerEmisor->bindParam(':alumno_id',$_SESSION['user_id']);
+                $traerEmisor->execute();
+                $emailEmisor= "";
+                foreach($traerEmisor as $valor){
+                    $emailEmisor =$valor['email'];
+                }
+                //emisor
+                $emisor = "Alumno|".$_SESSION['user_id'];
+
+
+
+                if(!empty($_POST['texto'])){
+                    $texto = $emailEmisor."|".$_POST['texto'];
+                }else{
+                    $texto = $emailEmisor." te ha recomendado ha este tutor";
+                }
+
+                $mensajeCompleto = "1|".$texto."|".$_POST['datos'];
+                $insertMensaje = $pdo->prepare('INSERT INTO mensajes (texto,emisor,receptor) VALUES (:texto,:emisor,:receptor)');
+                $insertMensaje->bindParam(':texto',$mensajeCompleto);
+                $insertMensaje->bindParam(':emisor',$emisor);
+                $insertMensaje->bindParam(':receptor',$receptor);
+                $insertMensaje->execute();
+
+            }else{
+                echo 'no se ha encontrado el usuario...';
+            }
+
+            
+
+        }else{
+            echo 'ingresa un correo del usuario destinatario';
+        }
+        
+        
+    }
 
 ?>
 
@@ -82,14 +141,14 @@
 						  </div>
 						  <nav id="nav-menu-container">
 							<ul class="nav-menu">
-							  <li class="activo"><a href="homealumno.php">Inicio</a></li>
+							  <li><a href="homealumno.php">Inicio</a></li>
 							  <li><a href="actualizaralumno.php">Mi Cuenta</a></li>
 							  <li><a href="materiasalumno.php">Materias</a></li>
 							  <!-- 
 							  <li><a href="hotels.html">Pupilos</a></li>
 							  <li><a href="insurance.html">Cobrar Puntos</a></li>
 							  -->
-							  <li class="menu-has-children"><a href="">Profesores</a>
+							  <li class="menu-has-children activoh"><a href="">Profesores</a>
 								<ul>
 								  <li><a href="elegirtutor.php">Elegir Tutor</a></li>
 								  <li><a href="mistutores.php">Mis Tutores</a></li>
@@ -144,7 +203,10 @@
 								$traerHistorial->bindParam(':alumno_id',$_SESSION['user_id']);
 								$traerHistorial->execute();
 
+
+								$contadorModal = 0;
 								foreach($traerHistorial as $valor){
+									$contadorModal +=1;
 									$id = $valor['id'];
 									$nombre = $valor['nombres'];
 									$apellidos = $valor['apellidos'];
@@ -161,14 +223,7 @@
 															<div class="single-sidebar-widget user-info-widget">
 																<img class="imgPerfil" src="./imagentutor/'.$imagen.'" alt="">
 																<a href="#"><h4 style="color: black;">'.$nombre.', '.$apellidos.'</h4></a>
-																
-																<div class="star">
-																	<span class="fa fa-star checked"></span>
-																	<span class="fa fa-star checked"></span>
-																	<span class="fa fa-star checked"></span>
-																	<span class="fa fa-star checked"></span>
-																	<span class="fa fa-star"></span>				
-																</div>	
+															
 																<hr>
 																<h5>'.$email.'</h5>
 																<h6>[Q '.$cobra.'/hora]</h6>
@@ -179,13 +234,46 @@
 											</div>
 											<div class="text-center">
 													<a href="perfiltutor.php?id='.$id.'" class="price-btn col-lg-5">Ir al perfil</a>
-													<button class="price-btn col-lg-5" data-toggle="modal" data-target="#compartir">Compartir</button>
+													<button class="price-btn" data-toggle="modal" data-target="#compartir'.$contadorModal.'">Compartir</button>
 												</div>
 											</div>
 										</div>
 										';
 									
 									echo '</div>';
+
+									////// modal 
+									echo '
+									<div class="modal fade" id="compartir'.$contadorModal.'" tabindex="-1" role="dialog" aria-labelledby="compartir" aria-hidden="true">
+											<div class="modal-dialog" role="document">
+											  <div class="modal-content">
+												<div class="modal-header">
+												  <h5 class="modal-title" id="exampleModalLabel">Compartir Tutor</h5>
+												  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												  </button>
+												</div>
+												<div class="modal-body">
+														<form action="historialtutores.php" method="post">
+															<div class="mt-10">
+																<input type="email" name="correo" placeholder="Correo (*Obligatorio.)" required="" class="single-input">
+															</div>
+															<div class="mt-10">
+																<input type="text" name="datos" value="'.$id.'|'.$nombre.'|'.$apellidos.'|'.$email.'|'.$cobra.'|'.$imagen.'" hidden="true">
+																<textarea class="single-textarea" placeholder="Mensaje (Opcional)" name="texto"></textarea>
+															</div>
+															<br>
+															<div class="">
+																<button type="submit" name="enviar" class="btn btn-block btn-primary">Compartir</button>
+															</div>
+														</form>
+												</div>
+											  </div>
+											</div>
+										  </div>
+									
+									
+									';
 								}
 							?>
 
@@ -283,33 +371,7 @@
 		<!-- End footer Area -->	
 			
 
-<!-- Modal -->
-<div class="modal fade" id="compartir" tabindex="-1" role="dialog" aria-labelledby="compartir" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-		  <div class="modal-content">
-			<div class="modal-header">
-			  <h5 class="modal-title" id="exampleModalLabel">Compartir Tutor</h5>
-			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			  </button>
-			</div>
-			<div class="modal-body">
-					<form action="">
-						<div class="mt-10">
-							<input type="email" name="EMAIL" placeholder="Correo (*Obligatorio.)" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Correo'" required="" class="single-input">
-						</div>
-						<div class="mt-10">
-							<textarea class="single-textarea" placeholder="Mensaje (Opcional)" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Mensaje'"></textarea>
-						</div>
-						<br>
-						<div class="">
-							<button type="button" class="btn btn-block btn-primary">Compartir</button>
-						</div>
-					</form>
-			</div>
-		  </div>
-		</div>
-	  </div>
+
   
   		<!-- preloader -->
 		  <div id='preloader'><div class='preloader'></div></div>

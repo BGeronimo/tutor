@@ -2,7 +2,7 @@
     require_once 'conection.php';
     session_start();
 
-    $traerAlumno = $pdo->query('SELECT * FROM  alumnos');
+    
     $retenerEmail = "";
 
     if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['confirmPassword'])){
@@ -55,11 +55,13 @@
                 echo 'las contraseñas no coinciden';
             }
 
+
+            $traerAlumno = $pdo->query('SELECT * FROM  alumnos');
             while($row = $traerAlumno->fetch(PDO::FETCH_ASSOC)){
                 if($row['email'] = $retenerEmail){
-                    $idAlumno = 1+$row['alumno_id'];
+                    $idAlumno = $row['alumno_id'];
                     $_SESSION['user_id'] = $idAlumno;
-                    header('Location: homealumno.php');
+                    header('Location: actualizaralumno.php');
                 }
             }
         }elseif($conteoInde == 1){

@@ -2,7 +2,7 @@
     require_once 'conection.php';
     session_start();
 
-    $traerTutor = $pdo->query('SELECT * FROM  tutores');
+    
     $retenerEmail = "";
 
     if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['confirmPassword'])){
@@ -49,11 +49,12 @@
                 $messagePass = 'las contraseñas no coinciden';
             }
 
+            $traerTutor = $pdo->query('SELECT * FROM  tutores');
             while($row = $traerTutor->fetch(PDO::FETCH_ASSOC)){
                 if($row['email'] = $retenerEmail){
-                    $idAlumno = 1+$row['tutor_id'];
-                    $_SESSION['user_id'] = $idAlumno;
-                    header('Location: hometutor.php');
+                    $idTuto = $row['tutor_id'];
+                    $_SESSION['user_id'] = $idTuto;
+                    header('Location: actualizartutor.php');
                 }
             }
 

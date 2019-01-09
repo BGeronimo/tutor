@@ -4,18 +4,20 @@
 
     $traerTutor = $pdo->prepare('SELECT *  FROM tutores WHERE tutor_id=:tutor_id');
     $traerTutor->bindParam(':tutor_id', $_SESSION['user_id']);
-    $traerTutor->execute();
+	$traerTutor->execute();
+	
+	
 
     //prueba
     $traerMateriasDisponibles = $pdo->prepare('SELECT materias.materia_id as id, materias.nombre as nombre, materias.descripcion as descripcion, materias.imagenmateria as imagen 
     FROM materias WHERE materias.materia_id NOT IN(SELECT materiatutor.materia_id 
-    FROM materiatutor WHERE materias.materia_id =materiatutor.materia_id AND  materiatutor.tutor_id = :tutor_id)');
+    FROM materiatutor WHERE materias.materia_id =materiatutor.materia_id AND materiatutor.activo=1 AND materiatutor.tutor_id = :tutor_id)');
     $traerMateriasDisponibles->bindParam(':tutor_id',$_SESSION['user_id']);
     $traerMateriasDisponibles->execute();
 
     $traerMateriasAsignadas = $pdo->prepare('SELECT materias.materia_id as id, materias.nombre as nombre, materias.descripcion as descripcion, materias.imagenmateria as imagen 
     FROM materias WHERE materias.materia_id IN(SELECT materiatutor.materia_id 
-    FROM materiatutor WHERE materias.materia_id =materiatutor.materia_id AND  materiatutor.tutor_id = :tutor_id)');
+    FROM materiatutor WHERE materias.materia_id =materiatutor.materia_id AND materiatutor.activo=1 AND materiatutor.tutor_id = :tutor_id)');
     $traerMateriasAsignadas->bindParam(':tutor_id',$_SESSION['user_id']);
     $traerMateriasAsignadas->execute();
     /////
@@ -24,34 +26,67 @@
     if(isset($_POST['escogerMateria'])){
         $contador = count($_POST['materia']);
         if($contador>0){
-            $base = "";
-            $vuelta = 0;
+			$base = "";
+			$baseActualizar = ""; 
+			$vuelta = 0;
+			
+			$traerMateriasDesactivadas = $pdo->query('SELECT materiatutor.materia_id
+			FROM materiatutor WHERE materiatutor.activo = 0 AND materiatutor.tutor_id='.$_SESSION['user_id'].'');
+
+			$arrayValores = array();
+			foreach($traerMateriasDesactivadas as $valor){
+				array_push($arrayValores,$valor['materia_id']);
+			}
+
+			$hacerInsert = 0;
             foreach($_POST['materia'] as $valor){
                 $vuelta +=1; 
                 if($contador>1){
-                    if($contador==$vuelta){
-                        $base .= "(".$valor.",".$_SESSION['user_id'].")";
-                    }else{
-                        $base .= "(".$valor.",".$_SESSION['user_id']."),";
-                    }
+					if(in_array($valor,$arrayValores)){
+						
+						if($contador==$vuelta){
+							$baseActualizar .= "materia_id=".$valor;
+							$actualizacionMasiva = $pdo->prepare('UPDATE materiatutor SET activo=1 WHERE tutor_id=:tutor_id  AND '.$baseActualizar.' ');
+				$actualizacionMasiva->bindParam(':tutor_id', $_SESSION['user_id']);
+				$actualizacionMasiva->execute(); 
+						}else{
+							$baseActualizar .= "materia_id=".$valor." OR ";
+						}
+
+					}else{
+						if($contador==$vuelta){
+							$base .= "(".$valor.",".$_SESSION['user_id'].")";
+							$escogerMateria = $pdo->query('INSERT INTO materiatutor (materia_id, tutor_id) VALUES '.$base.'');
+						}else{
+							$base .= "(".$valor.",".$_SESSION['user_id']."),";
+						}
+					}
+                    
                 }else{
-                    $base = "(".$valor.",".$_SESSION['user_id'].")";
+					if(in_array($valor,$arrayValores)){
+						$activarMateria = $pdo->query('UPDATE materiatutor SET activo=1 WHERE materia_id='.$valor.' AND tutor_id='.$_SESSION['user_id'].'');
+					}else{
+						$base = "(".$valor.",".$_SESSION['user_id'].")";
+					}
+                    
                 }
-            }
-            $escogerMateria = $pdo->query('INSERT INTO materiatutor (materia_id, tutor_id) VALUES '.$base.'');
+			}
+
             header('Location: materiastutor.php');
         }else{
+			
             echo 'elige una o mas materias primero';
         }
     }
 
     if(isset($_POST['desligar'])){
-        $borrarMateriaTutor = $pdo->prepare('DELETE FROM materiatutor WHERE tutor_id=:tutor_id AND materia_id=:materia_id');
-        $borrarMateriaTutor->bindParam(':materia_id', $_POST['materia_id']);
-        $borrarMateriaTutor->bindParam(':tutor_id', $_SESSION['user_id']);
-        if($borrarMateriaTutor->execute()){
-            header('Location: materiastutor.php');
-        }
+		$actualizarMateriaTutor = $pdo->prepare('UPDATE materiatutor SET activo=0 WHERE materia_id=:materia_id AND tutor_id=:tutor_id');
+		$actualizarMateriaTutor->bindParam(':materia_id', $_POST['materia_id']);
+		$actualizarMateriaTutor->bindParam(':tutor_id', $_SESSION['user_id']);
+		if($actualizarMateriaTutor->execute()){
+			header('Location: materiastutor.php');
+		}
+		
     }
 ?>
 
@@ -136,9 +171,9 @@
 						  </div>
 						  <nav id="nav-menu-container">
 							<ul class="nav-menu">
-							  <li class="activo"><a href="hometutor.php">Inicio</a></li>
+							  <li><a href="hometutor.php">Inicio</a></li>
 							  <li><a href="actualizartutor.php">Mi Cuenta</a></li>
-							  <li><a href="materiastutor.php">Materias</a></li>
+							  <li class="activo"><a href="materiastutor.php">Materias</a></li>
 							  
 							  <li><a href="pupilos.php">Pupilos</a></li>
 							  <li><a href="cobropuntos.php">Cobrar Puntos</a></li>

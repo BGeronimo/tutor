@@ -31,12 +31,19 @@
                         move_uploaded_file($_FILES['imagen']['tmp_name'],$lugarGuardado.$nombreImagen.'.png');
                         $nombreArreglado = $nombreImagen.'.png';
                     break;
-                }
-                
+				}
+				
+				$traerFotoActual = $pdo->query('SELECT imagenperfil FROM alumnos WHERE alumno_id='.$_SESSION['user_id'].'');
+				$imagenAntigua = "";
+				foreach($traerFotoActual as $valor){
+					$imagenAntigua = $valor['imagenperfil'];
+				}	
+				
                 $actualizarFoto = $pdo->prepare('UPDATE alumnos SET imagenperfil=:imagenperfil WHERE alumno_id=:alumno_id');
                 $actualizarFoto->bindParam(':imagenperfil', $nombreArreglado);
                 $actualizarFoto->bindParam(':alumno_id', $_SESSION['user_id']);
                 if($actualizarFoto->execute()){
+					unlink('./imagenalumno/'.$imagenAntigua);
                     header('Location: actualizaralumno.php');
                 }
                 
@@ -140,7 +147,7 @@
 							<div class="row align-items-center">
 								<div class="col-lg-6 col-sm-6 col-6 header-top-left">
 									<ul>
-										<li><a >['.$row[puntos].'] Puntos</a></li>
+										<li><a >['.$row['puntos'].'] Puntos</a></li>
 										<li><a href="#">Comprar Puntos</a></li>
 									</ul>			
 								</div>

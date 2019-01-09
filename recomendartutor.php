@@ -44,7 +44,7 @@
                     $texto = $emailEmisor." te ha recomendado ha este tutor";
                 }
 
-                $mensajeCompleto = "1|".$texto."|".$_POST['datosTutor'];
+                $mensajeCompleto = "1|".$texto."|".$_POST['datos'];
                 $insertMensaje = $pdo->prepare('INSERT INTO mensajes (texto,emisor,receptor) VALUES (:texto,:emisor,:receptor)');
                 $insertMensaje->bindParam(':texto',$mensajeCompleto);
                 $insertMensaje->bindParam(':emisor',$emisor);

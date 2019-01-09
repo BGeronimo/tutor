@@ -1,40 +1,88 @@
 <?php
     require_once 'conection.php';
+    require_once 'zonahoraria.php';
     session_start();
 
-	$traerAlumno = $pdo->query('SELECT *  FROM alumnos WHERE alumno_id='.$_SESSION['user_id'].'');
+    if(isset($_POST['pagar'])){
+        if(!empty($_POST['nocheque'])){
+            $fecha = zonaHoraria("Y-m-d H:i:s");
+            $id = $_POST['tutor_id'];
+            $cantidad = (int)$_POST['cantidad'];
+            $nocheque = $_POST['nocheque'];
 
-	$AND = "";
-	
-	
-	if(isset($_POST['mashoras'])){
-		$AND = " ORDER BY tutores.horasclase DESC ";
-	}
+            $comprobarPuntos = $pdo->query('SELECT puntos FROM tutores WHERE tutor_id='.$_POST['tutor_id'].'');
+            $puntosValidos = 0;
+            foreach($comprobarPuntos as $valor){
+                $puntosValidos = $valor['puntos']-($valor['puntos']*0.15);
+            }
 
-	if(isset($_POST['menoshoras'])){
-		$AND = " ORDER BY tutores.horasclase ASC ";
-	}
 
-	if(isset($_POST['mascerca'])){
-		$traerTutoresDistancia = $pdo->prepare('SELECT tutores.tutor_id, lugartutorias.longitud, lugartutorias.latitud FROM tutores, lugartutorias, materiatutor, materiaalumno, alumnos 
-		WHERE materiatutor.materia_id = materiaalumno.materia_id AND alumnos.alumno_id = :alumno_id AND tutores.tutor_id = materiatutor.tutor_id AND 
-		alumnos.alumno_id = materiaalumno.alumno_id	AND lugartutorias.tutor_id = materiatutor.tutor_id');
-		$traerTutoresDistancia->bindParam(':alumno_id', $_SESSION['user_id']);
-		$traerTutoresDistancia->execute();	
-		
-		
+            if($puntosValidos>=$cantidad){
+                $puntos = $puntosValidos-$cantidad;
 
-	}
-	
-	
+                $ingresarRegistro = $pdo->prepare('INSERT INTO pagostutor (tutor_id,cantidad,fecha,nocheque,administrador_id)
+                VALUES (:tutor_id,:cantidad,:fecha,:nocheque,:administrador_id)');
+                $ingresarRegistro->bindParam(':tutor_id', $id);
+                $ingresarRegistro->bindParam(':cantidad',$cantidad);
+                $ingresarRegistro->bindParam(':fecha',$fecha);
+                $ingresarRegistro->bindParam(':nocheque',$nocheque);
+                $ingresarRegistro->bindParam(':administrador_id',$_SESSION['user_id']);
+                $ingresarRegistro->execute();
+    
+                $actualizarTutor = $pdo->prepare('UPDATE tutores SET puntos=:puntos WHERE tutor_id=:tutor_id');
+                $actualizarTutor->bindParam(':puntos',$puntos);
+                $actualizarTutor->bindParam(':tutor_id',$id);
+                if($actualizarTutor->execute()){
+                    echo'<script>
+                    alert("se ha hecho todo correctamente");
+                    </script>';
+                }
+            }else{
+                echo'<script>
+                    alert("ingresa una cantidad valida");
+                    </script>';
+            }
+        }
+    }
 
-	$traerTutores = $pdo->prepare('SELECT DISTINCT tutores.tutor_id as tutorid ,tutores.nombres AS nombres, tutores.descripcion as descripcion,
-    tutores.imagenperfil AS imagen FROM tutores, materiatutor, materiaalumno, alumnos WHERE materiatutor.materia_id = materiaalumno.materia_id 
-    AND alumnos.alumno_id = :alumno_id AND tutores.tutor_id = materiatutor.tutor_id AND 
-    alumnos.alumno_id = materiaalumno.alumno_id '.$AND.'');
-    $traerTutores->bindParam(':alumno_id', $_SESSION['user_id']);
-	$traerTutores->execute();
+    if(isset($_POST['hacerCheque'])){
+        if(!empty($_POST['nocheque'])){
+            $fecha = zonaHoraria("Y-m-d H:i:s");
+            $nocheque = $_POST['nocheque'];
+            $trarePuntos = $pdo->prepare('SELECT puntos FROM tutores WHERE tutor_id=:tutor_id');
+            $trarePuntos->bindParam(':tutor_id',$_SESSION['idTutor']);
+            $trarePuntos->execute();
+            $puntosAntiguos = 0;
+            foreach($trarePuntos as $valor){
+                $puntosAntiguos = $valor['puntos'];
+            }
 
+            $puntos = $puntosAntiguos-$_SESSION['cantidad'];
+
+            $ingresarRegistro = $pdo->prepare('INSERT INTO pagostutor (tutor_id,cantidad,fecha,nocheque,administrador_id)
+            VALUES (:tutor_id,:cantidad,:fecha,:nocheque,:administrador_id)');
+            $ingresarRegistro->bindParam(':tutor_id', $_SESSION['idTutor']);
+            $ingresarRegistro->bindParam(':cantidad',$_SESSION['cantidad']);
+            $ingresarRegistro->bindParam(':fecha',$fecha);
+            $ingresarRegistro->bindParam(':nocheque',$nocheque);
+            $ingresarRegistro->bindParam(':administrador_id',$_SESSION['user_id']);
+            $ingresarRegistro->execute();
+
+            $actualizarTutor = $pdo->prepare('UPDATE tutores SET puntos=:puntos WHERE tutor_id=:tutor_id');
+            $actualizarTutor->bindParam(':puntos',$puntos);
+            $actualizarTutor->bindParam(':tutor_id',$_SESSION['idTutor']);
+            if($actualizarTutor->execute()){
+                echo'<script>
+                alert("se ha hecho todo correctamente");
+                </script>';
+                $mensajeVisto = $pdo->query('UPDATE mensajes SET visto=1 WHERE mensajes_id='.$_SESSION['mensaje'].'');
+            }
+        }else{
+            echo'<script>
+            alert("ingresa el numero de cheque");
+            </script>'; 
+        }
+    }
 ?>
 
 
@@ -54,7 +102,9 @@
 		<!-- meta character set -->
 		<meta charset="UTF-8">
 		<!-- Site Title -->
-		<title>Elegir Tutor | Tutoeri</title>
+		<title>Materias | Tutoeri</title>
+		<!-- Autenticacion con firebase -->
+		<script type="text/javascript" src="auth.js"></script>
 
 		<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
 			<!--
@@ -70,75 +120,27 @@
 			<link rel="stylesheet" href="css/owl.carousel.css">				
 			<link rel="stylesheet" href="css/main.css">
 		</head>
-		<body>	
+		<body>
 
-					<!---->
-		<header id="header">
-			<?php
-				$correo = "";
-				while($row = $traerAlumno->fetch(PDO::FETCH_ASSOC)){
-					if($row['datoscompletos'] == 0){
-						echo '
-						<div class="header-top">
-							<div class="container">
-							<div class="row align-items-center">
-								<div class="col-lg-6 col-sm-6 col-6 header-top-left">
-									<ul>
-										<li><a >['.$row[puntos].'] Puntos</a></li>
-										<li><a href="#">Comprar Puntos</a></li>
-									</ul>			
-								</div>
-							</div>			  					
-							</div>
-						</div>
-						';
-					}else{
-						//si tiene los datos completos
-						echo '
-						<div class="header-top">
-						<div class="container">
-						  <div class="row align-items-center">
-							  <div class="col-lg-6 col-sm-6 col-6 header-top-left">
-								  <ul>
-									  <li><a href="">['.$row['puntos'].'] Puntos</a></li>
-									  <li><a href="comprarpuntos.php">Comprar Puntos</a></li>
-								  </ul>			
-							  </div>
-						  </div>			  					
-						</div>
+		<!---->
+			<header id="header">
+                <div class="header-top">
+				<div class="container main-menu">
+					<div class="row align-items-center justify-content-between d-flex">
+				      <div id="logo">
+				        <a href="index.html"><img src="img/logo.png" alt="" title="" /></a>
+				      </div>
+				      <nav id="nav-menu-container">
+				        <ul class="nav-menu">
+				          <li class="activo"><a href="homeadministrador.php">Inicio</a></li>
+				          <li><a href="materias.php">Materias</a></li>
+				          <li><a href="pagartutor.php">Pagar a tutor</a></li>
+			          					          		          
+				          <li style="border: 1px dashed white; border-radius: 3px;"><a href="logout.php" onClick="logOut();">Salir</a></li>
+				        </ul>
+				      </nav><!-- #nav-menu-container -->					      		  
 					</div>
-					<div class="container main-menu">
-						<div class="row align-items-center justify-content-between d-flex">
-						  <div id="logo">
-							<a href="index.html"><img src="img/logo.png" alt="" title="" /></a>
-						  </div>
-						  <nav id="nav-menu-container">
-							<ul class="nav-menu">
-							  <li><a href="homealumno.php">Inicio</a></li>
-							  <li><a href="actualizaralumno.php">Mi Cuenta</a></li>
-							  <li><a href="materiasalumno.php">Materias</a></li>
-							  <!-- 
-							  <li><a href="hotels.html">Pupilos</a></li>
-							  <li><a href="insurance.html">Cobrar Puntos</a></li>
-							  -->
-							  <li class="menu-has-children activo"><a href="">Profesores</a>
-								<ul>
-								  <li><a href="elegirtutor.php">Elegir Tutor</a></li>
-								  <li><a href="mistutores.php">Mis Tutores</a></li>
-								  <li><a href="historialtutores.php">Historial de tutores</a></li>
-								</ul>
-							  </li>				          					          		          
-							  <li style="border: 1px dashed white; border-radius: 3px;"><a href="logout.php" onClick="logOut();">Salir</a></li>
-							</ul>
-						  </nav><!-- #nav-menu-container -->					      		  
-						</div>
-					</div>
-						';
-
-					}
-					$correo = $row['email'];
-				}
-				?>
+				</div>
 
 			</header><!-- #header -->
 			  
@@ -149,9 +151,8 @@
 					<div class="row d-flex align-items-center justify-content-center">
 						<div class="about-content col-lg-12">
 							<h1 class="text-white">
-								Elegir Tutor				
+								Pagar a tutor				
 							</h1>	
-							<p class="text-white link-nav">Profesores que enseñan tus materias deseadas</p>
 						</div>	
 					</div>
 				</div>
@@ -160,156 +161,67 @@
 
 			<!-- Start destinations Area -->
 			<section class="destinations-area section-gap">
-				<div class="container">
-		            <div class="">
-						<div class="">
-							<div class="row text-center">
-								<div class="col-md-12 typo-sec">
-									<h2 class="mb-20">Tutores Disponibles</h2>
-									<section class="post-content-area">
-										<div class="">
-											<div class="row">
-												<div class="col-lg-12 sidebar-widgets">
-													<div class="widget-wrap">
-														<div class="single-sidebar-widget tag-cloud-widget">
-															<h4 class="tagcloud-title">Categorías</h4>
-															<form action="elegirtutor.php" method="post">
-															<ul>
-																<li><a href="#">Technology</a></li>
-																<li><a href="#">Fashion</a></li>
-																<li><a href="#">Architecture</a></li>
-																<li><a href="#">Fashion</a></li>
-																<li><a href="#">Food</a></li>
-																<li><a href="#">Technology</a></li>
-																<li><a href="#">Lifestyle</a></li>
-																<li><a href="#">Art</a></li>
-																<li><a href="#">Adventure</a></li>
-																<li><a href="#">Food</a></li>
-																<li><a href="#">Lifestyle</a></li>
-																<li><a href="#">Adventure</a></li>
-																
-																
-															</ul>
-																<input type="submit" value="Mas Horas" name="mashoras" class="price-btn col-lg-2">
-																<input type="submit" value="Menos Horas" name="menoshoras" class="price-btn col-lg-2">
-															</form>
-														</div>								
-													</div>
-												</div>
-											</div>
-										</div>	
-									</section>
-								</div>
-							</div>
-						</div>
-					<div class="row">
 
-					<?php
-						while($row = $traerTutores->fetch(PDO::FETCH_ASSOC)){
-							echo '
-									<div class="col-lg-4">
-										<div class="single-destinations">
-											<div class="perfilTutor">
-												<div>
-													<div class="sidebar-widgets" style="padding-bottom: 0px;">
-														<div class="widget-wrap" style="border: 0px solid #edf3fd;">
-															<div class="single-sidebar-widget user-info-widget">
-																<img src="./imagentutor/'.$row['imagen'].'" class="imgPerfil" alt="">
-																<a href="#"><h4 style="color: #929294;">'.$row['nombres'].'</h4></a>
-																<div class="star">';
+                    <form action="pagartutor.php" method="post">
+                        <div>
+                            <label>correo del profesor</label>
+                            <input type="email" name="email">
+                            <input type="submit" value="buscar" name="buscar">
+                        </div>
+                    </form>
+                    <?php
+                    if(isset($_POST['buscar'])){
+                        echo $_POST['email'];
+                        $buscarTutores = $pdo->prepare('SELECT * FROM tutores WHERE email=:email');
+                        $buscarTutores->bindParam(':email',$_POST['email']);
+                        $buscarTutores->execute();
 
-																$traerCalificacion = $pdo->query('SELECT COUNT(calificacion) as numero, TRUNCATE( AVG(calificacion),0) as promediotruncate, TRUNCATE( AVG(calificacion),2) as promedio FROM calificaciones WHERE tutor_id = '.$row['tutorid'].' AND calificacion!=0');
-																
-																foreach($traerCalificacion as $valor){
-																	if($valor['numero']==0){
-																		echo '<p>Aun no ha sido calificado</p>';
-																		echo '
-																		<span class="fa fa-star"></span>
-																		<span class="fa fa-star"></span>
-																		<span class="fa fa-star"></span>
-																		<span class="fa fa-star"></span>
-																		<span class="fa fa-star"></span>
-																		';
-																	}else{
-																		
-																		echo '<p> calificacion: '.$valor['promedio'].'</p>';
-																		$numero = $valor['promediotruncate'];
-																		switch ($numero) {
-																			case 1:
-																				echo ' 
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star"></span>
-																				<span class="fa fa-star"></span>
-																				<span class="fa fa-star"></span>
-																				<span class="fa fa-star"></span>
-																				';
-																				break;
-																			case 2:
-																				echo '
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star"></span>
-																				<span class="fa fa-star"></span>
-																				<span class="fa fa-star"></span>
-																				';
-																				break;
-																			case 3:
-																				echo '
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star"></span>
-																				<span class="fa fa-star"></span>
-																				';
-																				break;
-																			case 4:
-																				echo '
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star"></span>
-																				';
-																				break;
-																			case 5:
-																				echo '
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				<span class="fa fa-star checked"></span>
-																				';
-																				break;
-																		}
-																	}
-																}
+                        foreach($buscarTutores as $valor){
+                            $valorAPagar = $valor['puntos']-($valor['puntos']*0.15);
+                            if($valor['puntos']<200){
+                                echo '<div class="alert alert-primary" role="alert">';
+                                echo 'este tutor no tiene los puntos suficientes para cobrar su pago';
+                                echo '</div>';
+                            }
+                            echo '<form action="pagartutor.php" method="post">';
+                            echo '<div>';
+                            echo '<h3>'.$valor['puntos'].' puntos ------ equivale a Q.'.$valorAPagar.'</h3>';
+                            echo '<h4>'.$valor['nombres'].', '.$valor['apellidos'].'</h4>';
+                            echo '<p>'.$valor['horasclase'].' horas de clase</p>';
+                            echo '</div>';
+                            echo '<div>';
+                            echo '<label>Numero de cheque que se le entrega</label>';
+                            echo '<input type="text" onkeypress="return valida(event)" name="nocheque" maxlength="12" onkeyup="validar(this.form)">';
+                            echo '</div>';
+                            echo '<input type="text" value="'.$valor['tutor_id'].'" name="tutor_id" hidden="true">';
+                            echo '<input type="text"  name="cantidad" onkeypress="return valida2(event)" placeholder="cantidad a pagar">';
+                            if($valor['puntos']<200){
+                                echo '<input type="submit" value="cobrar su paga" disabled>';
+                            }else{
+                                echo '<input type="submit" value="cobrar su paga" name="pagar" disabled="disabled">';
+                            }
+                            echo '</form>';
+                            echo '';
+                            
+                        }
+                    }
+                    if(isset($_GET['id'])){
+                        echo '<hr>';
+                        $_SESSION['idTutor'] = $_GET['id'];
+                        $_SESSION['cantidad'] = $_GET['cantidad'];
+                        $_SESSION['direccion'] = $_GET['direccion'];
+                        $_SESSION['mensaje'] = $_GET['mensaje'];
+                        
+                        echo '<form action="pagartutor.php" method="post">';
+                        echo '<input type="text" onkeypress="return valida(event)" name="nocheque" maxlength="12" onkeyup="validar(this.form)">';
+                        echo '<input type="text"  name="cantidad" value="'.$_SESSION['cantidad'].'" onkeypress="return valida2(event)" disabled>';
+                        echo '<input type="text" name="direccion" value="'.$_SESSION['direccion'].'" disabled>';
+                        echo '<input type="text" name="mensaje" value="'.$_SESSION['mensaje'].'" hidden="true">';
+                        echo '<input type="submit" value="hacer registro de cheque" name="hacerCheque">';
+                        echo '</form>';
+                    }
 
-						
-														echo'	</div>	
-																<br>
-																<p style="color: #929294;">
-																'.$row['descripcion'].' 
-																</p>
-																<input type="text" name="tutor_id" value="'.$row['tutorid'].'" hidden="true">
-															</div>
-														</div>
-													</div>		
-												</div>
-												<div class="text-center">
-													<a class="price-btn col-lg-6" href="perfiltutor.php?id='.$row['tutorid'].'">Ir al perfil</a>
-												</div>
-											</div>
-										</div>
-									</div>																													
-							';
-
-							$_SESSION['calificarTutor'] = $row['tutorid'];
-							
-						}
-					?>
-						</div>
-		        	</div>						
-				</div>	
+                    ?>
 			</section>
 			<!-- End destinations Area -->
 			
@@ -494,7 +406,7 @@
 			<script src="https://cdn.linearicons.com/free/1.0.0/svgembedder.min.js"></script>
 			<link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
 
-			<script type="text/javascript" src="auth.js"></script>
+            <script type="text/javascript" src="auth.js"></script>
 		</body>
 	
 		<script>
@@ -512,10 +424,45 @@
 	});
 	
 })(jQuery);
+
+
+    function valida(e){
+        tecla = (document.all) ? e.keyCode : e.which;
+
+        //Tecla de retroceso para borrar, siempre la permite
+        if (tecla==8){
+            return true;
+        }
+
+        // Patron de entrada, en este caso solo acepta numeros
+        patron =/[0-9]/;
+        tecla_final = String.fromCharCode(tecla);
+        return patron.test(tecla_final);
+    }
+
+    function valida2(e){
+        tecla = (document.all) ? e.keyCode : e.which;
+
+        //Tecla de retroceso para borrar, siempre la permite
+        if (tecla==8){
+            return true;
+        }
+
+        // Patron de entrada, en este caso solo acepta numeros
+        patron =/[0-9-.]/;
+        tecla_final = String.fromCharCode(tecla);
+        return patron.test(tecla_final);
+    }
+
+    function validar(frm) {
+    frm.pagar.disabled = false;
+    for (i=0; i<3; i++)
+        if (frm['txt'+i].value =='') return
+    frm.pagar.disabled = true;
+    }
+
 		</script>
 		<style>
-
-
 		.ec-stars-wrapper {
 	/* Espacio entre los inline-block (los hijos, los `a`) 
 	   http://ksesocss.blogspot.com/2012/03/display-inline-block-y-sus-empeno-en.html */
@@ -549,12 +496,6 @@
     border-radius: 3px;
     background: linear-gradient(#3D9F97, #00548F);
 }
-
-.activ{
-	border: 1px solid #01548f;
-	border-radius: 3px;
-	background: transparent;
-	/*color: white;*/
-}
 		</style>
 	</html>
+

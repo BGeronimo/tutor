@@ -87,14 +87,14 @@
 						  </div>
 						  <nav id="nav-menu-container">
 							<ul class="nav-menu">
-							  <li class="activo"><a href="homealumno.php">Inicio</a></li>
+							  <li><a href="homealumno.php">Inicio</a></li>
 							  <li><a href="actualizaralumno.php">Mi Cuenta</a></li>
 							  <li><a href="materiasalumno.php">Materias</a></li>
 							  <!-- 
 							  <li><a href="hotels.html">Pupilos</a></li>
 							  <li><a href="insurance.html">Cobrar Puntos</a></li>
 							  -->
-							  <li class="menu-has-children"><a href="">Profesores</a>
+							  <li class="menu-has-children activo"><a href="">Profesores</a>
 								<ul>
 								  <li><a href="elegirtutor.php">Elegir Tutor</a></li>
 								  <li><a href="mistutores.php">Mis Tutores</a></li>

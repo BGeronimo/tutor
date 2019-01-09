@@ -1,6 +1,6 @@
 <?php
     require_once 'conection.php';
-    session_start();
+	session_start();
 
     $traerAlumno = $pdo->query('SELECT *  FROM alumnos WHERE alumno_id='.$_SESSION['user_id'].'');
     
@@ -26,7 +26,7 @@
 
     if(isset($_POST['calificar'])){
         if(!empty($_POST['punteo'])){
-            $calificar = $pdo->prepare('UPDATE calificaciones SET calificacion=:calificacion, comentario=:comentario, revision=1 WHERE tutor_id=:tutor AND alumno_id=:alumno AND calificacion=0');
+            $calificar = $pdo->prepare('UPDATE calificaciones SET calificacion=:calificacion, comentario=:comentario WHERE tutor_id=:tutor AND alumno_id=:alumno AND calificacion=0');
             $calificar->bindParam(':calificacion', $_POST['punteo']);
             $calificar->bindParam(':comentario', $_POST['comentario']);
             $calificar->bindParam(':tutor', $_POST['idtutor']);
@@ -144,9 +144,7 @@
 							</ul>
 						  </nav><!-- #nav-menu-container -->					      		  
 						</div>
-					</div>
-						';
-
+					</div>';
 					}
 					$correo = $row['email'];
 				}

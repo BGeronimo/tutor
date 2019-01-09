@@ -37,17 +37,49 @@
         $tutorid = $_POST['idtutor'];
         $userid = $_SESSION['user_id'];
         $fecha = zonaHoraria("Y-m-d H:i:s");
-        $traerDatos = $pdo->prepare('SELECT horasclase, puntos FROM bancopuntos 
+        $traerDatos = $pdo->prepare('SELECT horasclase, puntos, materia_id FROM bancopuntos 
         WHERE bancopuntos.tutor_id=:tutor_id AND bancopuntos.alumno_id=:alumno_id AND bancopuntos.cobropuntos=0');
         $traerDatos->bindParam(':tutor_id',$tutorid);
         $traerDatos->bindParam(':alumno_id',$userid);
         $traerDatos->execute();
         $horas = 0;
-        $puntos = 0; 
+		$puntos = 0; 
+		$materiaId = 0;
         foreach($traerDatos as $valor){
                 $puntos = $valor['puntos'];
-                $horas = $valor['horasclase'];
-        }
+				$horas = $valor['horasclase'];
+				$materiaId = $valor['materia_id'];
+		}
+		
+		//////asigna las horas de clase segun la materia
+		$traerHorasMateria = $pdo->prepare('SELECT materias.horas as materiasHoras, materiatutor.horasclase as materiatutorHora 
+		FROM materias, materiatutor WHERE materias.materia_id=materiatutor.materia_id AND materias.materia_id=:materia_id AND materiatutor.tutor_id=:tutor_id');
+		$traerHorasMateria->bindParam(':materia_id', $materiaId);
+		$traerHorasMateria->bindParam(':tutor_id', $_POST['idtutor']);
+		$traerHorasMateria->execute();
+
+		$materias = 0;
+		$materiaTutor = 0;
+		foreach($traerHorasMateria as $valor){
+			$materias = $valor['materiasHoras'];
+			$materiaTutor = $valor['materiatutorHora'];
+		}
+		$materiasSuma = $materias+$horas;
+		$materiaTutorSuma = $materiaTutor+$horas;
+		var_dump($materiasSuma);
+		var_dump($materiaTutorSuma);
+
+		$actualizarHorasMateria = $pdo->prepare('UPDATE materias SET horas=:horas WHERE materia_id=:materia_id');
+		$actualizarHorasMateria->bindParam(':horas', $materiasSuma);
+		$actualizarHorasMateria->bindParam(':materia_id', $materiaId);
+		$actualizarHorasMateria->execute();
+
+		$actualizarHorasMateriaTutor = $pdo->prepare('UPDATE materiatutor SET horasclase=:horasclase WHERE materia_id=:materia_id AND tutor_id =:tutor_id');
+		$actualizarHorasMateriaTutor->bindParam(':horasclase', $materiaTutorSuma);
+		$actualizarHorasMateriaTutor->bindParam(':materia_id', $materiaId);
+		$actualizarHorasMateriaTutor->bindParam(':tutor_id', $_POST['idtutor']);
+		$actualizarHorasMateriaTutor->execute();
+
 
         $traerDatosTutor = $pdo->query('SELECT horasclase,puntos FROM tutores WHERE tutor_id='.$tutorid.'');
         $horasAntiguas = 0;
@@ -79,7 +111,7 @@
             $actualizarTutor->bindParam(':puntos',$puntosActualizados);
             $actualizarTutor->bindParam(':tutor_id',$tutorid);
             if($actualizarTutor->execute()){
-                header('Location: homealumno.php');   
+				header('Location: homealumno.php');   
             }
         }
     }
@@ -132,6 +164,7 @@
 		$traerDatosTutor = $pdo->query('SELECT cobra FROM tutores WHERE tutor_id='.$_SESSION['tutorId'].'');
     	$traerPuntos = $pdo->query('SELECT puntos FROM alumnos WHERE alumno_id='.$_SESSION['user_id'].'');
 
+
         $horas = (int)$_POST['cantidadHoras'];
         $cobra = 0;
         foreach($traerDatosTutor as $valor){
@@ -154,15 +187,16 @@
             $token = str_shuffle("abcdefghijklmno14725".uniqid());
             $puntosNuevos = $tiene-$cantidadCobrar;
             $actualizarPuntos = $pdo->query('UPDATE alumnos SET puntos='.$puntosNuevos.' WHERE alumno_id='.$_SESSION['user_id'].'');
-            $ingresarBancoPuntos = $pdo->prepare('INSERT INTO bancopuntos (bancopuntos_id,alumno_id,tutor_id,fechainicio,claveconfirmacion,puntos,horasclase) 
-            VALUES (:bancopuntos_id,:alumno_id,:tutor_id,:fechainicio,:claveconfirmacion,:puntos,:horasclase)');
+            $ingresarBancoPuntos = $pdo->prepare('INSERT INTO bancopuntos (bancopuntos_id,alumno_id,tutor_id,fechainicio,claveconfirmacion,puntos,horasclase,materia_id) 
+            VALUES (:bancopuntos_id,:alumno_id,:tutor_id,:fechainicio,:claveconfirmacion,:puntos,:horasclase,:materia_id)');
             $ingresarBancoPuntos->bindParam(':bancopuntos_id',$token);
             $ingresarBancoPuntos->bindParam(':alumno_id',$_SESSION['user_id']);
             $ingresarBancoPuntos->bindParam(':tutor_id',$_SESSION['tutorId']);
             $ingresarBancoPuntos->bindParam(':fechainicio',$fecha);
             $ingresarBancoPuntos->bindParam(':claveconfirmacion',$random);
             $ingresarBancoPuntos->bindParam(':puntos',$cantidadCobrar);
-            $ingresarBancoPuntos->bindParam(':horasclase',$horas);
+			$ingresarBancoPuntos->bindParam(':horasclase',$horas);
+			$ingresarBancoPuntos->bindParam(':materia_id', $_POST['materia']);
             if($ingresarBancoPuntos->execute()){
                 $sesion = 1;
                 $insertCalificacion = $pdo->prepare('INSERT INTO calificaciones (tutor_id,alumno_id,sesion,claveconfirmacion) VALUES (:tutor_id,:alumno_id,:sesion,:claveconfirmacion)');
@@ -315,7 +349,7 @@
 
 			$vermasTutor = $pdo->query('SELECT * FROM tutores WHERE tutor_id = '.$_GET['id'].'');
 
-			$traerMateriaTutor = $pdo->query('SELECT materias.nombre as nombre FROM materias, materiatutor WHERE materiatutor.materia_id=materias.materia_id AND materiatutor.tutor_id='.$_GET['id'].'');
+			$traerMateriaTutor = $pdo->query('SELECT materias.nombre as nombre, materiatutor.horasclase as horas, materiatutor.activo as activo FROM materias, materiatutor WHERE materiatutor.materia_id=materias.materia_id AND materiatutor.tutor_id='.$_GET['id'].'');
 
 			while($row = $vermasTutor->fetch(PDO::FETCH_ASSOC)){
 				echo '<form action="perfiltutor.php" method="post">';
@@ -348,14 +382,30 @@
 										<ul class="cat-list">';
 
 										foreach($traerMateriaTutor as $valor){
-				echo '
+											if($valor['activo'] == 1){
+												echo '
 											<li>
 												<a href="" class="d-flex justify-content-between">
 													<p>'.$valor['nombre'].'</p>
-													<p>[00 Horas]</p>
+													<p>['.$valor['horas'].' Horas]</p>
 												</a>
 											</li>
 											';
+
+											}else{
+												echo '
+											<li>
+												<a href="" class="d-flex justify-content-between">
+													<p>'.$valor['nombre'].' (por ahora no esta disponible esta materia)</p>
+													<p>['.$valor['horas'].' Horas]</p>
+												</a>
+											</li>
+											';
+											}
+
+
+				
+
 										}
 																
 				echo'					</ul>
@@ -704,6 +754,18 @@
 						  <option value="3">3 Horas</option>
 						  <option value="4">4 Horas</option>
 						  <option value="5">5 Horas</option>
+						</select>
+					  </div>
+					  <div class="form-group text-center">
+						<label for="exampleFormControlSelect1" style="font-size: 17px;">¿Qué materia desea?</label>
+						
+						<select name="materia" class="form-control" id="exampleFormControlSelect1">
+							<?php
+								$traerMateriaTutor2 = $pdo->query('SELECT materias.nombre as nombre, materias.materia_id as id FROM materias, materiatutor WHERE materiatutor.materia_id=materias.materia_id AND materiatutor.activo=1 AND materiatutor.tutor_id='.$_GET['id'].'');
+								foreach($traerMateriaTutor2 as $valor){
+									echo '<option value="'.$valor['id'].'">'.$valor['nombre'].'</option>';
+								}
+							?>
 						</select>
 					  </div>
 					<button type="submit" class="btn btn-block btn-primary my-1" name="enviar">Pagar Tutoría</button>
